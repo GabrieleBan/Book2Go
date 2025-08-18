@@ -1,0 +1,38 @@
+version: '3.8'
+
+networks:
+  lend_net:
+
+services:
+  lend-mysql:
+    image: mysql:latest
+    container_name: lend_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: lend
+      MYSQL_USER: lend
+      MYSQL_PASSWORD: rootpassword
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  lend-service:
+    build: .
+    container_name: lend_service_app
+    restart: always
+    depends_on:
+      lend-mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://lend-mysql:3306/lend
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: rootpassword
+      SPRING_APPLICATION_NAME: LendService
