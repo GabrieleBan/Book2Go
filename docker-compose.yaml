@@ -1,0 +1,86 @@
+version: '3.8'
+
+networks:
+  reader_net:
+
+services:
+
+#  lendservice
+  lend-mysql:
+    image: mysql:latest
+    container_name: lend_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: lend
+      MYSQL_USER: lend
+      MYSQL_PASSWORD: rootpassword
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  lend-service:
+    build:
+      context: ./LendService   # path to the module folder
+      dockerfile: Dockerfile
+    container_name: lend_service_app
+    restart: always
+    depends_on:
+      lend-mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://lend-mysql:3306/lend
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: rootpassword
+      SPRING_APPLICATION_NAME: LendService
+# reader service
+  reader-mysql:
+
+    image: mysql:latest
+    container_name: reader_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: reader
+      MYSQL_USER: reader
+      MYSQL_PASSWORD: rootpassword
+    ports:
+      - "3307:3306"   # puoi cambiare porta locale se vuoi evitare conflitti
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  reader-service:
+    build:
+      context: ./ReaderService   # path to the module folder
+      dockerfile: Dockerfile
+    container_name: reader_service_app
+    restart: always
+    depends_on:
+      reader-mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    ports:
+      - "8081:8080"   # porta esposta per il servizio
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://reader-mysql:3306/reader
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: rootpassword
+      SPRING_APPLICATION_NAME: ReaderService
+  rabbitmq:
+    image: rabbitmq:4.1.3-management
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
