@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 
-export default function AppHeader({ logoSrc, avatarSrc }) {
+export default function AppHeader({avatarSrc }) {
     const headerRef = useRef(null);
     const [headerHeight, setHeaderHeight] = useState(0);
 
@@ -30,7 +30,7 @@ export default function AppHeader({ logoSrc, avatarSrc }) {
 
 
                 <div className="flex items-center justify-center flex-1">
-                    <img src={logoSrc} alt="Logo" className="h-8 w-8 mr-2" />
+                    <img src="/src/assets/icon-only.png" alt="Logo" className="h-8 w-8 mr-2" />
                     <Input
                         placeholder="Cerca tra milioni di libri"
                         className="w-[45vw] rounded-lg"
