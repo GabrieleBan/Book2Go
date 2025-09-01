@@ -1,10 +1,19 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import {useAuth} from "@/components/auth-provider.jsx";
 
-export default function AppHeader({avatarSrc }) {
+
+
+
+
+export default function AppHeader({ avatarSrc }) {
     const headerRef = useRef(null);
     const [headerHeight, setHeaderHeight] = useState(0);
+    const [showLogin, setShowLogin] = useState(false);
+    const navigate = useNavigate();
+    const { user, login, logout } = useAuth();
 
     useEffect(() => {
         if (headerRef.current) {
@@ -21,26 +30,59 @@ export default function AppHeader({avatarSrc }) {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
+    const handleAvatarClick = () => {
+        if (user) {
+            navigate("/profile-page");
+        }
+    };
+
+    const handleLogin = () => {
+        setShowLogin(true);
+    };
+
+    const handleLogout = () => {
+        logout();
+    };
+
     return (
-
-
         <>
-            <header ref={headerRef} className="w-full fixed top-0 shadow bg-amber-100 z-50">
+            <header
+                ref={headerRef}
+                className="w-full fixed top-0 shadow bg-amber-100 z-50"
+            >
                 {/* Top header */}
-
-
                 <div className="flex items-center justify-center flex-1">
-                    <img src="/src/assets/icon-only.png" alt="Logo" className="h-8 w-8 mr-2" />
+                    <Link to="/">
+                        <img
+                            src="/src/assets/icon-only.png"
+                            alt="Logo"
+                            className="h-8 w-8 mr-2"
+                        />
+                    </Link>
+
                     <Input
                         placeholder="Cerca tra milioni di libri"
                         className="w-[45vw] rounded-lg"
                     />
-                    {/* Avatar on the right */}
+
+                    {/* Avatar */}
                     <img
-                        src={avatarSrc}
+                        onClick={handleAvatarClick}
+                        src={user?.avatar || avatarSrc}
                         alt="User"
-                        className="h-10 w-10 rounded-full left ml-4"
+                        className="h-10 w-10 rounded-full left ml-4 cursor-pointer"
                     />
+
+                    {/* Login / Logout Button */}
+                    {user ? (
+                        <Button onClick={handleLogout} className="ml-4">
+                            Logout
+                        </Button>
+                    ) : (
+                        <Button onClick={handleLogin} className="ml-4">
+                            Login
+                        </Button>
+                    )}
                 </div>
 
                 {/* Navigation bar */}
@@ -53,8 +95,32 @@ export default function AppHeader({avatarSrc }) {
                 </nav>
             </header>
 
-            {/* Spacer dynamically sized */}
-            <div style={{ height: headerHeight }} className="pointer-events-none" />
+            {/* Spacer */}
+            <div style={{ height: headerHeight/2 }} className="pointer-events-none" />
+
+            {/* Login modal */}
+            {showLogin && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 className="text-lg font-semibold mb-4">Log in</h2>
+                        <Button
+                            onClick={() => {
+                                login({ name: "Olivia Green", avatar: avatarSrc ,email:"tmp@dyyud", number:"+39 82962492" }); // dummy login
+                                setShowLogin(false);
+                            }}
+                        >
+                            Log In
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            className="ml-2"
+                            onClick={() => setShowLogin(false)}
+                        >
+                            Cancel
+                        </Button>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
