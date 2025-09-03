@@ -16,27 +16,27 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, BookOpen } from "lucide-react";
+import Book from "@/classes/Book.js";
 
-// Example books
+// ---------- Generate books as Book instances ----------
 const booksData = Array.from({ length: 40 }, (_, i) => {
     const isDigital = i % 3 === 0;
     const isLent = i % 4 === 0;
-
-    // expire date (only for lent books)
     const expireDate = isLent ? new Date(Date.now() + (i % 10) * 24 * 60 * 60 * 1000) : null;
 
-    return {
+    return new Book({
         id: i + 1,
         title: `Book ${i + 1}`,
         author: `Author ${i + 1}`,
-        price: 10 + (i % 15),
         rating: (i % 5) + 1,
+        image: "/placeholder-book.jpg",
+        description: `Description for Book ${i + 1}`,
+        prices: { Fisico: 10 + (i % 15), Digitale: 8 + (i % 10), Audiolibro: 5 + (i % 5) },
         format: isDigital ? "Digitale" : "Fisico",
         owned: !isLent,
         lent: isLent,
         expireDate,
-        image: "/placeholder-book.jpg",
-    };
+    });
 });
 
 export default function LibraryPage() {
@@ -48,35 +48,25 @@ export default function LibraryPage() {
     const showCount = 24; // 4 rows of 6 books
     const totalPages = Math.ceil(booksData.length / showCount);
 
-    // Filtering + sorting
+    // ---------- Filtering + sorting ----------
     const filteredBooks = useMemo(() => {
         let result = booksData.filter((b) =>
             b.title.toLowerCase().includes(search.toLowerCase())
         );
 
-        if (filter === "owned") {
-            result = result.filter((b) => b.owned);
-        } else if (filter === "lend") {
-            result = result.filter((b) => b.lent);
-        }
+        if (filter === "owned") result = result.filter((b) => b.owned);
+        if (filter === "lend") result = result.filter((b) => b.lent);
 
-        if (sortBy === "title") {
-            result = [...result].sort((a, b) => a.title.localeCompare(b.title));
-        } else if (sortBy === "rating") {
-            result = [...result].sort((a, b) => b.rating - a.rating);
-        } else if (sortBy === "recent") {
-            result = [...result].reverse();
-        }
+        if (sortBy === "title") result = [...result].sort((a, b) => a.title.localeCompare(b.title));
+        if (sortBy === "rating") result = [...result].sort((a, b) => b.rating - a.rating);
+        if (sortBy === "recent") result = [...result].reverse();
 
         return result;
     }, [search, filter, sortBy]);
 
-    const paginatedBooks = filteredBooks.slice(
-        (page - 1) * showCount,
-        page * showCount
-    );
+    const paginatedBooks = filteredBooks.slice((page - 1) * showCount, page * showCount);
 
-    // Helper to calculate remaining days
+    // ---------- Helper to calculate remaining days ----------
     const getRemainingDays = (expireDate) => {
         const diff = expireDate.getTime() - Date.now();
         return Math.ceil(diff / (1000 * 60 * 60 * 24));
@@ -84,10 +74,8 @@ export default function LibraryPage() {
 
     return (
         <div className="min-h-screen w-screen bg-white flex flex-col">
-            {/* Reusable header */}
             <AppHeader />
 
-            {/* Main content */}
             <main className="flex-1 px-4 md:px-8 py-6">
                 {/* Title */}
                 <div className="flex items-center gap-2 mb-6">
@@ -138,24 +126,19 @@ export default function LibraryPage() {
                 {/* Books Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
                     {paginatedBooks.map((book) => {
-                        const isExpiring =
-                            book.lent &&
-                            book.expireDate &&
-                            getRemainingDays(book.expireDate) <= 7;
+                        const isExpiring = book.lent && book.expireDate && getRemainingDays(book.expireDate) <= 7;
 
                         return (
                             <div key={book.id} className="relative">
                                 <BookCard book={book} />
 
-                                {/* Expiring badge */}
-                                {isExpiring && book.expireDate && (
+                                {isExpiring && (
                                     <div className="absolute top-2 left-2 flex items-center gap-1 text-xs bg-white px-2 py-1 rounded shadow text-gray-700">
                                         <Clock className="h-3 w-3" />
                                         {getRemainingDays(book.expireDate)} days
                                     </div>
                                 )}
 
-                                {/* Digital book icon */}
                                 {book.format === "Digitale" && (
                                     <div className="absolute top-2 right-2">
                                         <BookOpen className="h-5 w-5 text-gray-600" />
@@ -171,7 +154,6 @@ export default function LibraryPage() {
             <div className="bg-beige-100 py-4">
                 <Pagination>
                     <PaginationContent>
-                        {/* Previous button */}
                         <PaginationItem>
                             <PaginationPrevious
                                 href="#"
@@ -179,7 +161,6 @@ export default function LibraryPage() {
                             />
                         </PaginationItem>
 
-                        {/* Page numbers */}
                         {Array.from({ length: totalPages }, (_, i) => (
                             <PaginationItem key={i}>
                                 <PaginationLink
@@ -192,10 +173,8 @@ export default function LibraryPage() {
                             </PaginationItem>
                         ))}
 
-                        {/* Optional ellipsis if too many pages */}
                         {totalPages > 5 && <PaginationEllipsis />}
 
-                        {/* Next button */}
                         <PaginationItem>
                             <PaginationNext
                                 href="#"

@@ -5,11 +5,15 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     // user is an object containing multiple fields
     const [user, setUser] = useState(null);
+    const [lastBook, setLastBook] = useState(null);
 
-    // Persist login across refresh
+    // Persist login and lastBook across refresh
     useEffect(() => {
         const savedUser = localStorage.getItem("user");
         if (savedUser) setUser(JSON.parse(savedUser));
+
+        const savedBook = localStorage.getItem("lastBook");
+        if (savedBook) setLastBook(JSON.parse(savedBook));
     }, []);
 
     // login accepts a full user object
@@ -18,10 +22,12 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("user", JSON.stringify(userData));
     };
 
-    // logout clears the user
+    // logout clears the user and lastBook
     const logout = () => {
         setUser(null);
+        setLastBook(null);
         localStorage.removeItem("user");
+        localStorage.removeItem("lastBook");
     };
 
     // updateUser allows updating fields individually
@@ -33,8 +39,14 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
+    // setLastBook updates the last viewed book
+    const rememberBook = (book) => {
+        setLastBook(book);
+        localStorage.setItem("lastBook", JSON.stringify(book));
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, logout, updateUser }}>
+        <AuthContext.Provider value={{ user, login, logout, updateUser, lastBook, rememberBook }}>
             {children}
         </AuthContext.Provider>
     );

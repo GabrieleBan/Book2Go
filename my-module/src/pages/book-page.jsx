@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card.js";
 import { Button } from "@/components/ui/button.js";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group.js";
 import { Textarea } from "@/components/ui/textarea.js";
+import {useAuth} from "@/components/auth-provider.jsx";
+import BookCard from "@/components/book-card.jsx";
 import {
     Carousel,
     CarouselContent,
@@ -14,30 +16,99 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel.js";
 import StarRating from "@/components/star-rating.jsx";
-// ---------- BookPage ----------
+import Book from "@/classes/Book.js";
+
 export default function BookPage() {
     const [rating, setRating] = useState(0);
+    const { lastBook } = useAuth();
 
-    const book = {
+    // fallback book if lastBook is null
+    const testBook = new Book({
         title: "Dante",
         author: "Alessandro Barbero",
         rating: 4.9,
-        cover: "/dante.jpg",
+        image: "/src/assets/dante.jpg",
         description:
-            "Un'opera del Medioevo, immensa per vastità e portata. Questo è Dante! ...",
-        prices: {
-            Fisico: 33.5,
-            Digitale: 12.0,
-            Audiolibro: 3.0,
-        },
-    };
+            "Un uomo del Medioevo, immerso nel suo tempo. Questo il Dante che ci racconta un grande storico in pagine di vivida bellezza. Dante è l'uomo su cui, per la fama che lo accompagnava già in vita, sappiamo forse più cose che su qualunque altro uomo di quell'epoca, e che ci ha lasciato la sua testimonianza personale su cosa significava, allora, essere un giovane uomo innamorato o cosa si provava quando si saliva a cavallo per andare in battaglia. Alessandro Barbero segue Dante nella sua adolescenza di figlio d'un usuraio che sogna di appartenere al mondo dei nobili e dei letterati; nei corridoi oscuri della politica, dove gli ideali si infrangono davanti alla realtà meschina degli odi di partito e della corruzione dilagante; nei vagabondaggi dell'esiliato che scopre l'incredibile varietà dell'Italia del Trecento, fra metropoli commerciali e corti cavalleresche. Il libro affronta anche le lacune e i silenzi che rendono incerta la ricostruzione di interi periodi della vita di Dante, presentando gli argomenti pro e contro le diverse ipotesi e permettendo a chi legge di farsi una propria idea, come quando il lettore di un romanzo giallo è invitato a gareggiare con il detectivee arrivare per proprio conto a una conclusione.",
+        prices: { Fisico: 33.5, Digitale: 12.0, Audiolibro: 3.0 },
+    });
 
+    const book = lastBook instanceof Book ? lastBook : testBook;
+
+    // Recommendations as Book instances
     const recommendations = [
-        { id: 1, title: "Book name", author: "Autore", rating: 5 },
-        { id: 2, title: "Book name", author: "Autore", rating: 4 },
-        { id: 3, title: "Book name", author: "Autore", rating: 5 },
-        { id: 4, title: "Book name", author: "Autore", rating: 3 },
-        { id: 5, title: "Book name", author: "Autore", rating: 4 },
+        new Book({
+            id: 1,
+            title: "The Silent Horizon",
+            author: "Elena Moretti",
+            rating: 5,
+            prices: { Fisico: 10, Digitale:1 },
+            image: "/placeholder-book.jpg",
+            description: "An epic tale of survival and hope, following the journey of a young protagonist who is forced to confront the limits of courage and endurance. Through trials of isolation, unexpected friendships, and moments of deep despair, the book paints a vivid portrait of what it truly means to find meaning in adversity. Readers are invited into a richly detailed world where every choice carries weight and consequences ripple far beyond the moment."
+        }),
+        new Book({
+            id: 2,
+            title: "Whispers of the City",
+            author: "Giovanni Ricci",
+            rating: 4,
+            prices: { Fisico: 12 },
+            image: "/placeholder-book.jpg",
+            description: "Set against the backdrop of a city caught between tradition and modernity, this novel weaves together the stories of strangers whose paths intertwine in unexpected ways. Exploring themes of memory, forgiveness, and the quiet strength of human bonds, it challenges readers to reflect on their own relationships and the unspoken moments that shape them. With prose both delicate and powerful, the book resonates long after the final page."
+        }),
+        new Book({
+            id: 3,
+            title: "Shadows Across the Steppe",
+            author: "Anya Volkov",
+            rating: 5,
+            prices: { Fisico: 15 },
+            image: "/placeholder-book.jpg",
+            description: "A gripping adventure that blends mystery, danger, and the relentless pursuit of truth. The protagonist, torn between loyalty and personal ambition, embarks on a journey across unforgiving landscapes where every step reveals new secrets. With masterfully crafted suspense, this novel keeps readers at the edge of their seats, challenging them to untangle riddles that reach back into forgotten histories and hidden legacies."
+        }),
+        new Book({
+            id: 4,
+            title: "Echoes of Yesterday",
+            author: "Marta Pellegrini",
+            rating: 3,
+            prices: { Fisico: 8 },
+            image: "/placeholder-book.jpg",
+            description: "This introspective narrative delves into the complexities of choice, regret, and the lingering shadows of the past. Following the life of a character haunted by missed opportunities, the novel examines how a single decision can shape decades of experience. Through poignant storytelling and vivid emotional depth, it captures the fragile beauty of human resilience in the face of inevitable mistakes."
+        }),
+        new Book({
+            id: 5,
+            title: "The Garden of Ashes",
+            author: "Lorenzo De Santis",
+            rating: 4,
+            prices: { Fisico: 9 },
+            image: "/placeholder-book.jpg",
+            description: "A moving exploration of love, grief, and the search for redemption. The narrative follows intertwined lives across generations, showing how bonds of family and friendship can both wound and heal. With lyrical prose and heart-stirring imagery, this book invites readers to consider the quiet heroism of forgiveness and the ways in which healing often comes from the most unexpected sources."
+        }),
+        new Book({
+            id: 6,
+            title: "Fragments of Tomorrow",
+            author: "Clara Bianchi",
+            rating: 3,
+            prices: { Fisico: 8 },
+            image: "/placeholder-book.jpg",
+            description: "A character-driven story about identity, ambition, and the long journey toward self-acceptance. Through the lens of a protagonist navigating conflicting expectations, the novel explores the fragile balance between personal dreams and societal pressures. Rich in psychological depth, it illuminates the struggles of becoming while underscoring the quiet victories that define true growth."
+        }),
+        new Book({
+            id: 7,
+            title: "The House of Secrets",
+            author: "Francesco Vitale",
+            rating: 3,
+            prices: { Fisico: 8 },
+            image: "/placeholder-book.jpg",
+            description: "Suspenseful and deeply atmospheric, this book plunges the reader into a labyrinth of secrets where truth hides behind carefully constructed lies. Every chapter peels back another layer of deception, building toward a revelation that is as shocking as it is inevitable. It is both a thriller and a meditation on trust, exploring how even the closest relationships can harbor devastating betrayals."
+        }),
+        new Book({
+            id: 8,
+            title: "A River Between Worlds",
+            author: "Isabella Conti",
+            rating: 4,
+            prices: { Fisico: 11 },
+            image: "/placeholder-book.jpg",
+            description: "A sweeping saga spanning continents and decades, this novel traces the fortunes of a family bound together by love yet torn apart by ambition and circumstance. With a narrative that shifts seamlessly between intimate personal moments and grand historical events, it offers a profound exploration of heritage, identity, and the unyielding power of hope. The story resonates as both a personal journey and a universal reflection on belonging."
+        }),
     ];
 
     const reviews = [
@@ -58,23 +129,32 @@ export default function BookPage() {
     ];
 
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen w-full overflow-x-hidden flex flex-col">
             <AppHeader />
 
-            {/* Scrollable main content */}
-            <main className="flex-1 px-4 md:px-8 py-6 space-y-12 overflow-y-auto">
+            <main className="flex-1 w-full px-4 py-6 space-y-12 overflow-y-auto box-border">
                 {/* Book Info */}
-                <section className="flex flex-col md:flex-row gap-8">
-                    <div className="w-full md:w-1/3">
-                        <img
-                            src={book.cover}
-                            alt={book.title}
-                            className="w-full rounded-md shadow"
-                        />
+                <section className="flex flex-col md:flex-row gap-8 items-start w-full">
+                    {/* Image + Purchase Options */}
+                    <div className="flex flex-col self-start w-full md:w-[400px]">
+                        <div
+                            className="relative rounded-md shadow overflow-hidden bg-purple-50 flex items-center justify-center w-full"
+                            style={{ height: "500px" }}
+                        >
+                            {book.image ? (
+                                <img
+                                    src={book.image}
+                                    alt={book.title}
+                                    className="max-w-full max-h-full object-contain"
+                                />
+                            ) : (
+                                <span className="text-gray-400">No Cover</span>
+                            )}
+                        </div>
 
                         {/* Purchase Options */}
-                        <div className="mt-6">
-                            <h3 className="font-semibold mb-2">Acquista</h3>
+                        <div className="mt-6 w-full">
+                            <h5 className="font-semibold mb-2">Formati</h5>
                             <RadioGroup defaultValue="Fisico">
                                 {Object.entries(book.prices).map(([format, price]) => (
                                     <div
@@ -82,25 +162,34 @@ export default function BookPage() {
                                         className="flex items-center justify-between border p-2 rounded-md mb-2"
                                     >
                                         <div className="flex items-center gap-2">
-                                            <RadioGroupItem value={format} id={format} />
+                                            <RadioGroupItem
+                                                value={format}
+                                                id={format}
+                                                className="h-4 w-4 border border-gray-400 rounded-full
+                      data-[state=checked]:bg-black data-[state=checked]:border-black"
+                                            />
                                             <label htmlFor={format}>{format}</label>
                                         </div>
                                         <span>{price.toFixed(2)} €</span>
                                     </div>
                                 ))}
                             </RadioGroup>
+                            <div className="w-full flex items-center justify-end">
+                                <Button>Acquista</Button>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex-1">
-                        <h1 className="text-3xl font-bold">{book.title}</h1>
+                    {/* Book Details */}
+                    <div className="flex-1 min-w-0">
+                        <h1 className="text-3xl font-bold break-words">{book.title}</h1>
                         <p className="text-gray-600">Autore: {book.author}</p>
                         <div className="flex items-center gap-2 mt-2">
                             <StarRating value={Math.round(book.rating)} />
                             <span className="text-sm">{book.rating}/5</span>
                         </div>
 
-                        <p className="mt-6 text-gray-700 leading-relaxed">
+                        <p className="mt-6 text-gray-700 leading-relaxed break-words">
                             {book.description}
                         </p>
 
@@ -117,28 +206,20 @@ export default function BookPage() {
                     </div>
                 </section>
 
+
                 {/* Recommendations */}
-                <section>
-                    <h3 className="text-xl font-semibold mb-4">
-                        Potrebbe interessarti:
-                    </h3>
-                    <Carousel className="w-full">
-                        <CarouselContent>
+                <section >
+                    <h3 className="text-xl font-semibold mb-4">Potrebbe interessarti:</h3>
+                    <Carousel className="w-[95vw] overflow-hidden"> {/* clip overflowing content */}
+                        <CarouselContent className="flex  "> {/* padding-right so last card fits */}
                             {recommendations.map((rec) => (
                                 <CarouselItem
                                     key={rec.id}
-                                    className="basis-1/2 sm:basis-1/3 md:basis-1/5"
+                                    className="basis-[200px] flex-shrink-0 flex justify-center"
                                 >
-                                    <Card className="p-2 text-center">
-                                        <div className="h-32 bg-purple-50 flex items-center justify-center rounded">
-                                            Cover
-                                        </div>
-                                        <p className="mt-2 font-medium">{rec.title}</p>
-                                        <p className="text-sm text-gray-600">{rec.author}</p>
-                                        <p className="text-yellow-500">
-                                            {"★".repeat(rec.rating)}
-                                        </p>
-                                    </Card>
+                                    <div className="w-[180px] h-[280px]">
+                                        <BookCard book={rec} />
+                                    </div>
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
@@ -148,7 +229,7 @@ export default function BookPage() {
                 </section>
 
                 {/* Reviews */}
-                <section>
+                <section className="w-full">
                     <h3 className="text-xl font-semibold mb-4">Recensioni</h3>
                     <div className="space-y-4">
                         {reviews.map((r) => (
@@ -169,7 +250,6 @@ export default function BookPage() {
                 </section>
             </main>
 
-            {/* Bottom bar */}
             <div className="bg-beige-100 h-10" />
         </div>
     );

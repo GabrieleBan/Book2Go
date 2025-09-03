@@ -1,6 +1,7 @@
 import AppHeader from "@/components/AppHeader";
 import {Card} from "@/components/ui/card.js";
 import {HistoryList} from "@/components/history-list.jsx";
+
 export default function PersonalHistory() {
     return (
         <div className="min-h-screen w-screen overflow-x-hidden bg-beige-100 flex flex-col">

@@ -6,6 +6,7 @@ import LibraryPage from "@/pages/personal-library.jsx";
 import PersonalHistory from "@/pages/personal-history.jsx";
 import AppHeader from "@/components/AppHeader.jsx";
 import BookPage from "@/pages/book-page.jsx";
+import HomePage from "@/pages/home-page.jsx";
 
 export default function App() {
     return (
@@ -13,11 +14,12 @@ export default function App() {
             <Router>
                 <AppHeader avatarSrc="/src/assets/default-avatar.png"/>
                 <Routes>
-                    <Route path="/catalog-page" element={<CatalogPage/>}/>
-                    <Route path="/" element={<ProfilePage/>}/>
+                    <Route path="/" element={<HomePage/>}/>
+                    <Route path="/catalog" element={<CatalogPage/>}/>
+                    <Route path="/profile-page" element={<ProfilePage/>}/>
                     <Route path="/personal-library" element={<LibraryPage/>}/>
                     <Route path="/personal-history" element={<PersonalHistory/>}/>
-                    {/*<Route path="/" element={<BookPage/>}/>*/}
+                    <Route path="/book" element={<BookPage/>}/>
                 </Routes>
             </Router>
         </AuthProvider>

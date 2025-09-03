@@ -73,22 +73,27 @@ export default function AppHeader({ avatarSrc }) {
                         className="h-10 w-10 rounded-full left ml-4 cursor-pointer"
                     />
 
-                    {/* Login / Logout Button */}
-                    {user ? (
-                        <Button onClick={handleLogout} className="ml-4">
-                            Logout
-                        </Button>
-                    ) : (
-                        <Button onClick={handleLogin} className="ml-4">
-                            Login
-                        </Button>
-                    )}
+                    <div className="absolute right-0">
+                        {/* Login / Logout Button */}
+                        {user ? (
+                            <Button onClick={handleLogout} className="ml-4">
+                                Logout
+                            </Button>
+                        ) : (
+                            <Button onClick={handleLogin} className="ml-4">
+                                Login
+                            </Button>
+                        )}
+                    </div>
+
                 </div>
 
                 {/* Navigation bar */}
                 <nav className="flex flex-wrap justify-around sm:justify-between px-4 bg-purple-50 py-1 shadow-inner">
                     <button className="btn-ghost min-w-0">Trovaci</button>
-                    <button className="btn-ghost min-w-0">Libri</button>
+                    <Link to="/catalog">
+                        <button className="btn-ghost min-w-0">Libri</button>
+                    </Link>
                     <button className="btn-ghost min-w-0">Categorie</button>
                     <button className="btn-ghost min-w-0">Eventi</button>
                     <button className="btn-ghost min-w-0">Notifiche</button>
@@ -100,7 +105,7 @@ export default function AppHeader({ avatarSrc }) {
 
             {/* Login modal */}
             {showLogin && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+                <div className="fixed inset-0 flex z-50 items-center justify-center bg-black/50">
                     <div className="bg-white p-6 rounded-lg shadow-lg">
                         <h2 className="text-lg font-semibold mb-4">Log in</h2>
                         <Button

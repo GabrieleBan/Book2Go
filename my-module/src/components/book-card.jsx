@@ -1,9 +1,19 @@
 import { Card } from "@/components/ui/card";
-// ---------- BookCard Component ----------
+import { useAuth } from "@/components/auth-provider.jsx";
+import { useNavigate } from "react-router-dom";
+import Book from "@/classes/Book.js";
 
 export default function BookCard({ book }) {
+    const { rememberBook } = useAuth();
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        rememberBook(book);
+        navigate("/book");
+    };
+
     return (
-        <Card className="p-2 flex flex-col items-center justify-between">
+        <Card className="p-2 flex flex-col items-center justify-between cursor-pointer" onClick={handleClick}>
             <div className="relative w-full h-40 bg-purple-50 rounded-md flex items-center justify-center overflow-hidden">
                 {book.image ? (
                     <img
@@ -18,10 +28,9 @@ export default function BookCard({ book }) {
             <div className="mt-2 text-center">
                 <p className="font-medium">{book.title}</p>
                 <p className="text-sm text-gray-600">{book.author}</p>
-                <p className="text-yellow-500">{"★".repeat(book.rating)}</p>
-                <p className="font-medium">{book.price} €</p>
+                <p className="text-yellow-500">{book.getStars()}</p>
+                <p className="font-medium">{book.getPrice("Fisico")} €</p>
             </div>
         </Card>
     );
 }
-
