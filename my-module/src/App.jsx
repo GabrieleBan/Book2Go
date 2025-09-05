@@ -7,6 +7,7 @@ import PersonalHistory from "@/pages/personal-history.jsx";
 import AppHeader from "@/components/AppHeader.jsx";
 import BookPage from "@/pages/book-page.jsx";
 import HomePage from "@/pages/home-page.jsx";
+import CategoriesPage from "@/pages/categories-page.jsx";
 
 export default function App() {
     return (
@@ -16,6 +17,7 @@ export default function App() {
                 <Routes>
                     <Route path="/" element={<HomePage/>}/>
                     <Route path="/catalog" element={<CatalogPage/>}/>
+                    <Route path="/categories" element={<CategoriesPage/>}/>
                     <Route path="/profile-page" element={<ProfilePage/>}/>
                     <Route path="/personal-library" element={<LibraryPage/>}/>
                     <Route path="/personal-history" element={<PersonalHistory/>}/>

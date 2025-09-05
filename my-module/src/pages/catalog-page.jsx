@@ -21,20 +21,59 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { useEffect, useState, useMemo } from "react";
+import Book from "@/classes/Book.js";
 
 export default function CatalogPage() {
     // Example books
-    const [books] = useState([
-        { id: 1, title: "Dante", author: "Alessandro Barbero", price: 33.5, rating: 5, format: "Fisico", tags: ["Storia", "Classico"], image: "/dante.jpg" },
-        { id: 2, title: "The Hobbit", author: "J.R.R. Tolkien", price: 20, rating: 5, format: "Digitale", tags: ["Avventura", "Classico"] },
-        { id: 3, title: "Sapiens", author: "Yuval Noah Harari", price: 25, rating: 4, format: "Audiolibro", tags: ["Storia"] },
-        { id: 4, title: "Il Nome della Rosa", author: "Umberto Eco", price: 30, rating: 5, format: "Fisico", tags: ["Storia", "Mistero"] },
-        { id: 5, title: "Dune", author: "Frank Herbert", price: 28, rating: 5, format: "Digitale", tags: ["Avventura", "Fantascienza"] },
-        { id: 6, title: "Dune", author: "Frank Herbert", price: 28, rating: 5, format: "Digitale", tags: ["Avventura", "Fantascienza"] },
-        { id: 7, title: "Dune", author: "Frank Herbert", price: 28, rating: 5, format: "Digitale", tags: ["Avventura", "Fantascienza"] },
-        { id: 8, title: "Dune", author: "Frank Herbert", price: 28, rating: 5, format: "Digitale", tags: ["Avventura", "Fantascienza"] },
-        { id: 9, title: "Dune", author: "Frank Herbert", price: 28, rating: 5, format: "Digitale", tags: ["Avventura", "Fantascienza"] },
-    ]);
+
+
+    const books = [
+        new Book({
+            id: 1,
+            title: "Dante",
+            author: "Alessandro Barbero",
+            rating: 5,
+            image: "/dante.jpg",
+            description: "A historical exploration of Dante's works.",
+            prices: { Fisico: 33.5, Digitale: null, Audiolibro: null }
+        }),
+        new Book({
+            id: 2,
+            title: "The Hobbit",
+            author: "J.R.R. Tolkien",
+            rating: 5,
+            image: null,
+            description: "A classic fantasy adventure.",
+            prices: { Fisico: null, Digitale: 20, Audiolibro: null }
+        }),
+        new Book({
+            id: 3,
+            title: "Sapiens",
+            author: "Yuval Noah Harari",
+            rating: 4,
+            image: null,
+            description: "A brief history of humankind.",
+            prices: { Fisico: null, Digitale: null, Audiolibro: 25 }
+        }),
+        new Book({
+            id: 4,
+            title: "Il Nome della Rosa",
+            author: "Umberto Eco",
+            rating: 5,
+            image: null,
+            description: "A historical mystery novel.",
+            prices: { Fisico: 30, Digitale: null, Audiolibro: null }
+        }),
+        new Book({
+            id: 5,
+            title: "Dune",
+            author: "Frank Herbert",
+            rating: 5,
+            image: null,
+            description: "Epic science fiction adventure.",
+            prices: { Fisico: null, Digitale: 28, Audiolibro: null }
+        }),
+    ];
 
     // Filters
     const [search, setSearch] = useState("");
@@ -63,19 +102,39 @@ export default function CatalogPage() {
 
     // Filtered + sorted books
     const filteredBooks = useMemo(() => {
-        let result = books.filter(
-            (b) =>
-                b.title.toLowerCase().includes(search.toLowerCase()) &&
-                (selectedTags.length === 0 || selectedTags.some((tag) => b.tags.includes(tag))) &&
-                (selectedFormat.length === 0 || selectedFormat.includes(b.format)) &&
-                b.price >= priceRange[0] &&
-                b.price <= priceRange[1]
-        );
+        let result = books.filter((b) => {
+            // Filter by search
+            const matchesSearch = b.title.toLowerCase().includes(search.toLowerCase());
 
+            // Filter by tags
+            const matchesTags = selectedTags.length === 0 || (b.tags && selectedTags.some((tag) => b.tags.includes(tag)));
+
+            // Filter by format
+            const matchesFormat =
+                selectedFormat.length === 0 ||
+                selectedFormat.some((format) => b.prices[format] !== null);
+
+            // Filter by price
+            const bookMinPrice = Math.min(...Object.values(b.prices).filter((p) => p !== null));
+            const bookMaxPrice = Math.max(...Object.values(b.prices).filter((p) => p !== null));
+            const matchesPrice = bookMinPrice <= priceRange[1] && bookMaxPrice >= priceRange[0];
+
+            return matchesSearch && matchesTags && matchesFormat && matchesPrice;
+        });
+
+        // Sorting
         if (sortBy === "price-asc") {
-            result = [...result].sort((a, b) => a.price - b.price);
+            result = [...result].sort((a, b) => {
+                const aMin = Math.min(...Object.values(a.prices).filter((p) => p !== null));
+                const bMin = Math.min(...Object.values(b.prices).filter((p) => p !== null));
+                return aMin - bMin;
+            });
         } else if (sortBy === "price-desc") {
-            result = [...result].sort((a, b) => b.price - a.price);
+            result = [...result].sort((a, b) => {
+                const aMax = Math.max(...Object.values(a.prices).filter((p) => p !== null));
+                const bMax = Math.max(...Object.values(b.prices).filter((p) => p !== null));
+                return bMax - aMax;
+            });
         } else if (sortBy === "title") {
             result = [...result].sort((a, b) => a.title.localeCompare(b.title));
         }

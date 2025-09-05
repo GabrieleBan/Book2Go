@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {useAuth} from "@/components/auth-provider.jsx";
-
+import {LoginComponent} from "@/components/login-component.jsx";
 
 
 
@@ -94,7 +94,10 @@ export default function AppHeader({ avatarSrc }) {
                     <Link to="/catalog">
                         <button className="btn-ghost min-w-0">Libri</button>
                     </Link>
-                    <button className="btn-ghost min-w-0">Categorie</button>
+                    <Link to="/categories">
+                        <button className="btn-ghost min-w-0">Categorie</button>
+                    </Link>
+
                     <button className="btn-ghost min-w-0">Eventi</button>
                     <button className="btn-ghost min-w-0">Notifiche</button>
                 </nav>
@@ -105,24 +108,9 @@ export default function AppHeader({ avatarSrc }) {
 
             {/* Login modal */}
             {showLogin && (
-                <div className="fixed inset-0 flex z-50 items-center justify-center bg-black/50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg">
-                        <h2 className="text-lg font-semibold mb-4">Log in</h2>
-                        <Button
-                            onClick={() => {
-                                login({ name: "Olivia Green", avatar: avatarSrc ,email:"tmp@dyyud", number:"+39 82962492" }); // dummy login
-                                setShowLogin(false);
-                            }}
-                        >
-                            Log In
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            className="ml-2"
-                            onClick={() => setShowLogin(false)}
-                        >
-                            Cancel
-                        </Button>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 pointer-events-auto">
+                    <div  className="bg-white p-6 rounded-lg shadow-lg" onClick={e => e.stopPropagation()}>
+                        <LoginComponent show={showLogin} />
                     </div>
                 </div>
             )}
