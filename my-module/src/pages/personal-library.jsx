@@ -17,25 +17,57 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, BookOpen } from "lucide-react";
 import Book from "@/classes/Book.js";
+import LibraryBook from "@/classes/LibraryBook.js";
 
-// ---------- Generate books as Book instances ----------
+const sampleTitles = [
+    "The Silent Horizon", "Whispers of the City", "Shadows Across the Steppe",
+    "Echoes of Yesterday", "The Garden of Ashes", "Fragments of Tomorrow",
+    "The House of Secrets", "A River Between Worlds", "Lost in the Mist",
+    "Beyond the Stars", "The Forgotten Path", "Crimson Night"
+];
+
+const sampleAuthors = [
+    "Elena Moretti", "Giovanni Ricci", "Anya Volkov", "Marta Pellegrini",
+    "Lorenzo De Santis", "Clara Bianchi", "Francesco Vitale", "Isabella Conti"
+];
+
+const sampleTags = [
+    ["Avventura", "Sopravvivenza"],
+    ["Romantico", "Drammatico"],
+    ["Thriller", "Mistero"],
+    ["Storia", "Famiglia"],
+    ["Fantascienza", "Avventura"],
+    ["Horror", "Suspense"]
+];
+
 const booksData = Array.from({ length: 40 }, (_, i) => {
-    const isDigital = i % 3 === 0;
-    const isLent = i % 4 === 0;
-    const expireDate = isLent ? new Date(Date.now() + (i % 10) * 24 * 60 * 60 * 1000) : null;
+    const title = sampleTitles[i % sampleTitles.length] + (i >= sampleTitles.length ? ` Vol. ${Math.floor(i / sampleTitles.length) + 1}` : "");
+    const author = sampleAuthors[i % sampleAuthors.length];
+    const rating = Math.floor(Math.random() * 5) + 1; // 1-5
+    const isDigital = Math.random() < 0.4;
+    const isLent = Math.random() < 0.3;
+    const expireDate = isLent ? new Date(Date.now() + Math.floor(Math.random() * 15) * 24 * 60 * 60 * 1000) : null;
+    const tags = sampleTags[i % sampleTags.length];
 
-    return new Book({
+    // realistic prices
+    const prices = {};
+    if (Math.random() < 0.8) prices.Fisico = 8 + Math.floor(Math.random() * 15);
+    if (Math.random() < 0.7) prices.Digitale = 3 + Math.floor(Math.random() * 10);
+    if (Math.random() < 0.5) prices.Audiolibro = 5 + Math.floor(Math.random() * 10);
+
+    return new LibraryBook({
         id: i + 1,
-        title: `Book ${i + 1}`,
-        author: `Author ${i + 1}`,
-        rating: (i % 5) + 1,
+        title,
+        author,
+        rating,
         image: "/placeholder-book.jpg",
-        description: `Description for Book ${i + 1}`,
-        prices: { Fisico: 10 + (i % 15), Digitale: 8 + (i % 10), Audiolibro: 5 + (i % 5) },
+        description: `A captivating story for "${title}" by ${author}. This book will take you on an unforgettable journey filled with emotions, twists, and insights.`,
+        prices,
         format: isDigital ? "Digitale" : "Fisico",
         owned: !isLent,
         lent: isLent,
         expireDate,
+        tags
     });
 });
 
@@ -129,19 +161,21 @@ export default function LibraryPage() {
                         const isExpiring = book.lent && book.expireDate && getRemainingDays(book.expireDate) <= 7;
 
                         return (
-                            <div key={book.id} className="relative">
+                            <div key={book.id} className="relative w-[180px]">
                                 <BookCard book={book} />
 
-                                {isExpiring && (
+                                {/* Expiring badge */}
+                                {book.lent && book.expireDate && getRemainingDays(book.expireDate) <= 7 && (
                                     <div className="absolute top-2 left-2 flex items-center gap-1 text-xs bg-white px-2 py-1 rounded shadow text-gray-700">
                                         <Clock className="h-3 w-3" />
                                         {getRemainingDays(book.expireDate)} days
                                     </div>
                                 )}
 
+                                {/* Digital format badge */}
                                 {book.format === "Digitale" && (
-                                    <div className="absolute top-2 right-2">
-                                        <BookOpen className="h-5 w-5 text-gray-600" />
+                                    <div className="absolute top-2 right-1 w-6 h-6 rounded-full bg-yellow-200 flex items-center justify-center shadow">
+                                        <BookOpen className="h-3 w-3 text-gray-600" />
                                     </div>
                                 )}
                             </div>

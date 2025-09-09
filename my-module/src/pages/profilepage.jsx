@@ -5,11 +5,21 @@ import {useAuth} from "@/components/auth-provider.jsx";
 
 import ProfileActions from "@/components/profile-actions";
 import AppHeader from "@/components/AppHeader";
+
+import User from "@/classes/User.js";
 export default function ProfilePage() {
-    const { user } = useAuth();
+    let { user } = useAuth();
 
     // If not logged in
-    if (!user) return <p className="p-4">Please log in to view your profile.</p>;
+    if (!user) {
+        user = new User({
+            name: "Mario",
+            surname: "Rossi",
+            email: "mario.rossi@example.com",
+            number: "+39 333 1234567",
+        });
+    }//return <p className="p-4">Please log in to view your profile.</p>;
+
 
     return (
         <div className=" w-screen bg-beige-100 flex flex-col">

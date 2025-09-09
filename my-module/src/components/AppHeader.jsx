@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {useAuth} from "@/components/auth-provider.jsx";
 import {LoginComponent} from "@/components/login-component.jsx";
-
+import {SearchBar} from "@/components/search-bar.jsx";
 
 
 
@@ -48,7 +48,7 @@ export default function AppHeader({ avatarSrc }) {
         <>
             <header
                 ref={headerRef}
-                className="w-full fixed top-0 shadow bg-amber-100 z-50"
+                className="w-full fixed top-0 shadow  bg-[#F5E7D2] z-50"
             >
 
                 {/* Top header */}
@@ -61,10 +61,7 @@ export default function AppHeader({ avatarSrc }) {
                         />
                     </Link>
 
-                    <Input
-                        placeholder="Cerca tra milioni di libri"
-                        className="w-[45vw] rounded-lg"
-                    />
+                    <SearchBar></SearchBar>
 
                     {/* Avatar */}
                     <img
@@ -90,17 +87,17 @@ export default function AppHeader({ avatarSrc }) {
                 </div>
 
                 {/* Navigation bar */}
-                <nav className="flex  justify-around sm:justify-between px-4 bg-purple-50 py-1 shadow-inner">
-                    <button className="btn-ghost min-w-0">Trovaci</button>
+                <nav className="flex  justify-around sm:justify-between px-4 bg-[#ECE6F0] py-1 shadow-inner">
+                    <button className="btn-ghost bg-[#ECE6F0] min-w-0">Trovaci</button>
                     <Link to="/catalog">
-                        <button className="btn-ghost min-w-0">Libri</button>
+                        <button className="btn-ghost bg-[#ECE6F0] min-w-0">Libri</button>
                     </Link>
                     <Link to="/categories">
-                        <button className="btn-ghost min-w-0">Categorie</button>
+                        <button className="btn-ghost bg-[#ECE6F0] min-w-0">Categorie</button>
                     </Link>
 
-                    <button className="btn-ghost min-w-0">Eventi</button>
-                    <button className="btn-ghost min-w-0">Notifiche</button>
+                    <button  className="btn-ghost  bg-[#ECE6F0] min-w-0">Eventi</button>
+                    <button className="btn-ghost bg-[#ECE6F0] min-w-0">Notifiche</button>
                 </nav>
             </header>
 

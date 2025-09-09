@@ -194,7 +194,7 @@ export default function HomePage() {
 
                 {/* Trending Books */}
                 <section className="px-6 py-8">
-                    <h2 className="text-2xl font-semibold mb-4">Trending Books</h2>
+
                     {/* Trending Books */}
                     <section className="px-6 py-8">
                         <h2 className="text-2xl font-semibold mb-4">Trending Books</h2>
@@ -202,7 +202,7 @@ export default function HomePage() {
                             <CarouselContent className="flex gap-4">
                                 {trendingBooks.map((book) => (
                                     <CarouselItem key={book.id} className="flex-none">
-                                        <div className="w-[180px] h-[280px]">
+                                        <div className="w-[180px] h-auto">
                                             <BookCard book={book} />
                                         </div>
                                     </CarouselItem>
@@ -220,7 +220,7 @@ export default function HomePage() {
                             <CarouselContent className="flex gap-4">
                                 {recommendedBooks.map((book) => (
                                     <CarouselItem key={book.id} className="flex-none">
-                                        <div className="w-[180px] h-[280px]">
+                                        <div className="w-[180px] h-auto">
                                             <BookCard book={book} />
                                         </div>
                                     </CarouselItem>

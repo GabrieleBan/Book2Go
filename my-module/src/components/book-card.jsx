@@ -14,7 +14,7 @@ export default function BookCard({ book }) {
     };
 
     return (
-        <Card className="p-2 flex  w-48 aspect-[3/5] flex-col items-center justify-between cursor-pointer" onClick={handleClick}>
+        <Card className="p-2 flex border-2 border-[#6E3517] w-48 aspect-[3/5] flex-col items-center justify-between cursor-pointer" onClick={handleClick}>
             <div className="relative w-full h-40 bg-purple-50 rounded-md flex items-center justify-center overflow-hidden">
                 {book.image ? (
                     <img
