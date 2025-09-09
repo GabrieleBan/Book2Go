@@ -50,6 +50,7 @@ export default function AppHeader({ avatarSrc }) {
                 ref={headerRef}
                 className="w-full fixed top-0 shadow bg-amber-100 z-50"
             >
+
                 {/* Top header */}
                 <div className="flex items-center justify-center flex-1">
                     <Link to="/">
@@ -89,7 +90,7 @@ export default function AppHeader({ avatarSrc }) {
                 </div>
 
                 {/* Navigation bar */}
-                <nav className="flex flex-wrap justify-around sm:justify-between px-4 bg-purple-50 py-1 shadow-inner">
+                <nav className="flex  justify-around sm:justify-between px-4 bg-purple-50 py-1 shadow-inner">
                     <button className="btn-ghost min-w-0">Trovaci</button>
                     <Link to="/catalog">
                         <button className="btn-ghost min-w-0">Libri</button>

@@ -9,6 +9,7 @@ export default function BookCard({ book }) {
 
     const handleClick = () => {
         rememberBook(book);
+        window.scrollTo(0, 0);
         navigate("/book");
     };
 

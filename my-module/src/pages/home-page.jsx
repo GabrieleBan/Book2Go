@@ -14,79 +14,167 @@ export default function HomePage() {
     const [trendingBooks] = useState([
         new Book({
             id: 1,
-            title: "The Metamorphosis",
-            author: "Franz Kafka",
-            rating: 4,
-            image: "/kafka.jpg",
-            description: "A novella by Franz Kafka about the surreal transformation of Gregor Samsa...",
-            prices: { Fisico: 12.0, Digitale: 8.0, Audiolibro: 5.0 },
+            title: "The Silent Horizon",
+            author: "Elena Moretti",
+            rating: 5,
+            prices: { Fisico: 10, Digitale: 1 },
+            image: "/placeholder-book.jpg",
+            description: "An epic tale of survival and hope, following the journey of a young protagonist who is forced to confront the limits of courage and endurance. Through trials of isolation, unexpected friendships, and moments of deep despair, the book paints a vivid portrait of what it truly means to find meaning in adversity. Readers are invited into a richly detailed world where every choice carries weight and consequences ripple far beyond the moment.",
+            tags: ["Avventura", "Drammatico", "Sopravvivenza"]
         }),
         new Book({
             id: 2,
-            title: "The Hobbit",
-            author: "J.R.R. Tolkien",
-            rating: 5,
-            image: "/hobbit.jpg",
-            description: "Bilbo Baggins embarks on a journey filled with adventure and magic...",
-            prices: { Fisico: 20.0, Digitale: 15.0, Audiolibro: 10.0 },
+            title: "Whispers of the City",
+            author: "Giovanni Ricci",
+            rating: 4,
+            prices: { Fisico: 12 },
+            image: "/placeholder-book.jpg",
+            description: "Set against the backdrop of a city caught between tradition and modernity, this novel weaves together the stories of strangers whose paths intertwine in unexpected ways. Exploring themes of memory, forgiveness, and the quiet strength of human bonds, it challenges readers to reflect on their own relationships and the unspoken moments that shape them. With prose both delicate and powerful, the book resonates long after the final page.",
+            tags: ["Storia", "Romantico", "Drammatico"]
         }),
         new Book({
             id: 3,
-            title: "Dune",
-            author: "Frank Herbert",
+            title: "Shadows Across the Steppe",
+            author: "Anya Volkov",
             rating: 5,
-            image: "/dune.jpg",
-            description: "The epic tale of Paul Atreides and the desert planet Arrakis...",
-            prices: { Fisico: 28.0, Digitale: 20.0, Audiolibro: 15.0 },
+            prices: { Fisico: 15 },
+            image: "/placeholder-book.jpg",
+            description: "A gripping adventure that blends mystery, danger, and the relentless pursuit of truth. The protagonist, torn between loyalty and personal ambition, embarks on a journey across unforgiving landscapes where every step reveals new secrets. With masterfully crafted suspense, this novel keeps readers at the edge of their seats, challenging them to untangle riddles that reach back into forgotten histories and hidden legacies.",
+            tags: ["Avventura", "Mistero", "Thriller"]
         }),
         new Book({
             id: 4,
-            title: "Sapiens",
-            author: "Yuval Noah Harari",
-            rating: 4,
-            image: "/sapiens.jpg",
-            description: "A brief history of humankind from the Stone Age to the modern age...",
-            prices: { Fisico: 25.0, Digitale: 18.0, Audiolibro: 12.0 },
+            title: "Echoes of Yesterday",
+            author: "Marta Pellegrini",
+            rating: 3,
+            prices: { Fisico: 8 },
+            image: "/placeholder-book.jpg",
+            description: "This introspective narrative delves into the complexities of choice, regret, and the lingering shadows of the past. Following the life of a character haunted by missed opportunities, the novel examines how a single decision can shape decades of experience. Through poignant storytelling and vivid emotional depth, it captures the fragile beauty of human resilience in the face of inevitable mistakes.",
+            tags: ["Storia", "Drammatico", "Riflessivo"]
         }),
+        new Book({
+            id: 5,
+            title: "The Garden of Ashes",
+            author: "Lorenzo De Santis",
+            rating: 4,
+            prices: { Fisico: 9 },
+            image: "/placeholder-book.jpg",
+            description: "A moving exploration of love, grief, and the search for redemption. The narrative follows intertwined lives across generations, showing how bonds of family and friendship can both wound and heal. With lyrical prose and heart-stirring imagery, this book invites readers to consider the quiet heroism of forgiveness and the ways in which healing often comes from the most unexpected sources.",
+            tags: ["Romantico", "Drammatico", "Famiglia"]
+        }),
+        new Book({
+            id: 6,
+            title: "Fragments of Tomorrow",
+            author: "Clara Bianchi",
+            rating: 3,
+            prices: { Fisico: 8 },
+            image: "/placeholder-book.jpg",
+            description: "A character-driven story about identity, ambition, and the long journey toward self-acceptance. Through the lens of a protagonist navigating conflicting expectations, the novel explores the fragile balance between personal dreams and societal pressures. Rich in psychological depth, it illuminates the struggles of becoming while underscoring the quiet victories that define true growth.",
+            tags: ["Filosofico", "Riflessivo", "Drammatico"]
+        }),
+        new Book({
+            id: 7,
+            title: "The House of Secrets",
+            author: "Francesco Vitale",
+            rating: 3,
+            prices: { Fisico: 8 },
+            image: "/placeholder-book.jpg",
+            description: "Suspenseful and deeply atmospheric, this book plunges the reader into a labyrinth of secrets where truth hides behind carefully constructed lies. Every chapter peels back another layer of deception, building toward a revelation that is as shocking as it is inevitable. It is both a thriller and a meditation on trust, exploring how even the closest relationships can harbor devastating betrayals.",
+            tags: ["Thriller", "Mistero", "Suspense"]
+        }),
+        new Book({
+            id: 8,
+            title: "A River Between Worlds",
+            author: "Isabella Conti",
+            rating: 4,
+            prices: { Fisico: 11 },
+            image: "/placeholder-book.jpg",
+            description: "A sweeping saga spanning continents and decades, this novel traces the fortunes of a family bound together by love yet torn apart by ambition and circumstance. With a narrative that shifts seamlessly between intimate personal moments and grand historical events, it offers a profound exploration of heritage, identity, and the unyielding power of hope. The story resonates as both a personal journey and a universal reflection on belonging.",
+            tags: ["Storia", "Famiglia", "Drammatico"]
+        })
     ]);
 
     const [recommendedBooks] = useState([
         new Book({
-            id: 5,
-            title: "Il Nome della Rosa",
-            author: "Umberto Eco",
+            id: 1,
+            title: "The Silent Horizon",
+            author: "Elena Moretti",
             rating: 5,
-            image: "/nome-della-rosa.jpg",
-            description: "A historical murder mystery set in an Italian monastery during the 14th century...",
-            prices: { Fisico: 30.0, Digitale: 20.0, Audiolibro: 15.0 },
+            prices: { Fisico: 10, Digitale: 1 },
+            image: "/placeholder-book.jpg",
+            description: "An epic tale of survival and hope, following the journey of a young protagonist who is forced to confront the limits of courage and endurance. Through trials of isolation, unexpected friendships, and moments of deep despair, the book paints a vivid portrait of what it truly means to find meaning in adversity. Readers are invited into a richly detailed world where every choice carries weight and consequences ripple far beyond the moment.",
+            tags: ["Avventura", "Drammatico", "Sopravvivenza"]
+        }),
+        new Book({
+            id: 2,
+            title: "Whispers of the City",
+            author: "Giovanni Ricci",
+            rating: 4,
+            prices: { Fisico: 12 },
+            image: "/placeholder-book.jpg",
+            description: "Set against the backdrop of a city caught between tradition and modernity, this novel weaves together the stories of strangers whose paths intertwine in unexpected ways. Exploring themes of memory, forgiveness, and the quiet strength of human bonds, it challenges readers to reflect on their own relationships and the unspoken moments that shape them. With prose both delicate and powerful, the book resonates long after the final page.",
+            tags: ["Storia", "Romantico", "Drammatico"]
+        }),
+        new Book({
+            id: 3,
+            title: "Shadows Across the Steppe",
+            author: "Anya Volkov",
+            rating: 5,
+            prices: { Fisico: 15 },
+            image: "/placeholder-book.jpg",
+            description: "A gripping adventure that blends mystery, danger, and the relentless pursuit of truth. The protagonist, torn between loyalty and personal ambition, embarks on a journey across unforgiving landscapes where every step reveals new secrets. With masterfully crafted suspense, this novel keeps readers at the edge of their seats, challenging them to untangle riddles that reach back into forgotten histories and hidden legacies.",
+            tags: ["Avventura", "Mistero", "Thriller"]
+        }),
+        new Book({
+            id: 4,
+            title: "Echoes of Yesterday",
+            author: "Marta Pellegrini",
+            rating: 3,
+            prices: { Fisico: 8 },
+            image: "/placeholder-book.jpg",
+            description: "This introspective narrative delves into the complexities of choice, regret, and the lingering shadows of the past. Following the life of a character haunted by missed opportunities, the novel examines how a single decision can shape decades of experience. Through poignant storytelling and vivid emotional depth, it captures the fragile beauty of human resilience in the face of inevitable mistakes.",
+            tags: ["Storia", "Drammatico", "Riflessivo"]
+        }),
+        new Book({
+            id: 5,
+            title: "The Garden of Ashes",
+            author: "Lorenzo De Santis",
+            rating: 4,
+            prices: { Fisico: 9 },
+            image: "/placeholder-book.jpg",
+            description: "A moving exploration of love, grief, and the search for redemption. The narrative follows intertwined lives across generations, showing how bonds of family and friendship can both wound and heal. With lyrical prose and heart-stirring imagery, this book invites readers to consider the quiet heroism of forgiveness and the ways in which healing often comes from the most unexpected sources.",
+            tags: ["Romantico", "Drammatico", "Famiglia"]
         }),
         new Book({
             id: 6,
-            title: "1984",
-            author: "George Orwell",
-            rating: 5,
-            image: "/1984.jpg",
-            description: "A dystopian novel about totalitarian surveillance and oppression...",
-            prices: { Fisico: 18.0, Digitale: 12.0, Audiolibro: 8.0 },
+            title: "Fragments of Tomorrow",
+            author: "Clara Bianchi",
+            rating: 3,
+            prices: { Fisico: 8 },
+            image: "/placeholder-book.jpg",
+            description: "A character-driven story about identity, ambition, and the long journey toward self-acceptance. Through the lens of a protagonist navigating conflicting expectations, the novel explores the fragile balance between personal dreams and societal pressures. Rich in psychological depth, it illuminates the struggles of becoming while underscoring the quiet victories that define true growth.",
+            tags: ["Filosofico", "Riflessivo", "Drammatico"]
         }),
         new Book({
             id: 7,
-            title: "Brave New World",
-            author: "Aldous Huxley",
-            rating: 4,
-            image: "/brave-new-world.jpg",
-            description: "A dystopian future exploring science, technology, and societal control...",
-            prices: { Fisico: 15.0, Digitale: 10.0, Audiolibro: 7.0 },
+            title: "The House of Secrets",
+            author: "Francesco Vitale",
+            rating: 3,
+            prices: { Fisico: 8 },
+            image: "/placeholder-book.jpg",
+            description: "Suspenseful and deeply atmospheric, this book plunges the reader into a labyrinth of secrets where truth hides behind carefully constructed lies. Every chapter peels back another layer of deception, building toward a revelation that is as shocking as it is inevitable. It is both a thriller and a meditation on trust, exploring how even the closest relationships can harbor devastating betrayals.",
+            tags: ["Thriller", "Mistero", "Suspense"]
         }),
         new Book({
             id: 8,
-            title: "Divina Commedia",
-            author: "Dante Alighieri",
-            rating: 5,
-            image: "/divina-commedia.jpg",
-            description: "Dante's epic poem journeying through Hell, Purgatory, and Paradise...",
-            prices: { Fisico: 35.0, Digitale: 25.0, Audiolibro: 20.0 },
-        }),
+            title: "A River Between Worlds",
+            author: "Isabella Conti",
+            rating: 4,
+            prices: { Fisico: 11 },
+            image: "/placeholder-book.jpg",
+            description: "A sweeping saga spanning continents and decades, this novel traces the fortunes of a family bound together by love yet torn apart by ambition and circumstance. With a narrative that shifts seamlessly between intimate personal moments and grand historical events, it offers a profound exploration of heritage, identity, and the unyielding power of hope. The story resonates as both a personal journey and a universal reflection on belonging.",
+            tags: ["Storia", "Famiglia", "Drammatico"]
+        })
     ]);
 
     return (
@@ -107,33 +195,41 @@ export default function HomePage() {
                 {/* Trending Books */}
                 <section className="px-6 py-8">
                     <h2 className="text-2xl font-semibold mb-4">Trending Books</h2>
-                    <Carousel className="w-full">
-                        <CarouselContent>
-                            {trendingBooks.map((book) => (
-                                <CarouselItem key={book.id} className="basis-1/2 md:basis-1/4">
-                                    <BookCard book={book} />
-                                </CarouselItem>
-                            ))}
-                        </CarouselContent>
-                        <CarouselPrevious />
-                        <CarouselNext />
-                    </Carousel>
-                </section>
+                    {/* Trending Books */}
+                    <section className="px-6 py-8">
+                        <h2 className="text-2xl font-semibold mb-4">Trending Books</h2>
+                        <Carousel className="w-full">
+                            <CarouselContent className="flex gap-4">
+                                {trendingBooks.map((book) => (
+                                    <CarouselItem key={book.id} className="flex-none">
+                                        <div className="w-[180px] h-[280px]">
+                                            <BookCard book={book} />
+                                        </div>
+                                    </CarouselItem>
+                                ))}
+                            </CarouselContent>
+                            <CarouselPrevious />
+                            <CarouselNext />
+                        </Carousel>
+                    </section>
 
-                {/* Recommended for you */}
-                <section className="px-6 py-8">
-                    <h2 className="text-2xl font-semibold mb-4">Recommended for you</h2>
-                    <Carousel className="w-full">
-                        <CarouselContent>
-                            {recommendedBooks.map((book) => (
-                                <CarouselItem key={book.id} className="basis-1/2 md:basis-1/4">
-                                    <BookCard book={book} />
-                                </CarouselItem>
-                            ))}
-                        </CarouselContent>
-                        <CarouselPrevious />
-                        <CarouselNext />
-                    </Carousel>
+                    {/* Recommended for you */}
+                    <section className="px-6 py-8">
+                        <h2 className="text-2xl font-semibold mb-4">Recommended for you</h2>
+                        <Carousel className="w-full">
+                            <CarouselContent className="flex gap-4">
+                                {recommendedBooks.map((book) => (
+                                    <CarouselItem key={book.id} className="flex-none">
+                                        <div className="w-[180px] h-[280px]">
+                                            <BookCard book={book} />
+                                        </div>
+                                    </CarouselItem>
+                                ))}
+                            </CarouselContent>
+                            <CarouselPrevious />
+                            <CarouselNext />
+                        </Carousel>
+                    </section>
                 </section>
             </main>
 
