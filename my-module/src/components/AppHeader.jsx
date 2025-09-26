@@ -2,9 +2,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import {useAuth} from "@/components/auth-provider.jsx";
+import {Context} from "@/components/context-provider.jsx";
 import {LoginComponent} from "@/components/login-component.jsx";
 import {SearchBar} from "@/components/search-bar.jsx";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.js";
 
 
 
@@ -13,7 +14,8 @@ export default function AppHeader({ avatarSrc }) {
     const [headerHeight, setHeaderHeight] = useState(0);
     const [showLogin, setShowLogin] = useState(false);
     const navigate = useNavigate();
-    const { user, login, logout } = useAuth();
+    const { user, login, logout } = Context();
+    const [showLogout, setShowLogOut]=useState(false);
 
     useEffect(() => {
         if (headerRef.current) {
@@ -42,7 +44,14 @@ export default function AppHeader({ avatarSrc }) {
 
     const handleLogout = () => {
         logout();
+        setShowLogOut(true)
     };
+
+
+    function afterLogOut() {
+        setShowLogOut(false);
+        navigate("/");
+    }
 
     return (
         <>
@@ -108,8 +117,41 @@ export default function AppHeader({ avatarSrc }) {
             {showLogin && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 pointer-events-auto">
                     <div  className="bg-white p-6 rounded-lg shadow-lg" onClick={e => e.stopPropagation()}>
-                        <LoginComponent show={showLogin} />
+                        <LoginComponent setShowLogin={setShowLogin}  />
                     </div>
+                </div>
+            )}
+            {showLogout && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <Card className="w-96 p-6 text-center relative">
+                        {/* Chiudi con X in alto a destra */}
+                        <button
+                            onClick={() => afterLogOut()}
+                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-lg font-bold"
+                        >
+                            ×
+                        </button>
+
+                        <CardHeader>
+                            <CardTitle className="text-xl font-bold text-green-600">Logged Out</CardTitle>
+                        </CardHeader>
+
+                        <CardContent>
+                            <p className="text-gray-700">
+                                Alla prossima
+                            </p>
+                        </CardContent>
+
+                        <CardFooter>
+                            <Button
+                                variant="outline"
+                                className="w-full bg-green-100 text-green-800 hover:bg-green-200"
+                                onClick={() => afterLogOut()}
+                            >
+                                Chiudi
+                            </Button>
+                        </CardFooter>
+                    </Card>
                 </div>
             )}
         </>

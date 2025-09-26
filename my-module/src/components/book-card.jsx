@@ -1,10 +1,10 @@
 import { Card } from "@/components/ui/card";
-import { useAuth } from "@/components/auth-provider.jsx";
+import { Context } from "@/components/context-provider.jsx";
 import { useNavigate } from "react-router-dom";
 import Book from "@/classes/Book.js";
 
 export default function BookCard({ book }) {
-    const { rememberBook } = useAuth();
+    const { rememberBook } = Context();
     const navigate = useNavigate();
 
     const handleClick = () => {

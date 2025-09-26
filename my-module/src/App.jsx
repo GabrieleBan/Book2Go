@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import {AuthProvider} from "@/components/auth-provider.jsx";
+import {ContextProvider} from "@/components/context-provider.jsx";
 import CatalogPage from "@/pages/catalog-page.jsx";
 import ProfilePage from "@/pages/profilepage.jsx";
 import LibraryPage from "@/pages/personal-library.jsx";
@@ -11,7 +11,7 @@ import CategoriesPage from "@/pages/categories-page.jsx";
 
 export default function App() {
     return (
-        <AuthProvider>
+        <ContextProvider>
             <Router>
                 <AppHeader avatarSrc="/src/assets/default-avatar.png"/>
                 <Routes>
@@ -24,6 +24,6 @@ export default function App() {
                     <Route path="/book" element={<BookPage/>}/>
                 </Routes>
             </Router>
-        </AuthProvider>
+        </ContextProvider>
     );
 }

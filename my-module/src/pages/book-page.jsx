@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card.js";
 import { Button } from "@/components/ui/button.js";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group.js";
 import { Textarea } from "@/components/ui/textarea.js";
-import {useAuth} from "@/components/auth-provider.jsx";
+import {Context} from "@/components/context-provider.jsx";
 import BookCard from "@/components/book-card.jsx";
 import {
     Carousel,
@@ -20,7 +20,7 @@ import Book from "@/classes/Book.js";
 
 export default function BookPage() {
     const [rating, setRating] = useState(0);
-    const { lastBook } = useAuth();
+    const { lastBook } = Context();
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);

@@ -19,4 +19,21 @@ export default class Book{
     getStars() {
         return "★".repeat(Math.floor(this.rating));
     }
+
+    toJSON() {
+        return {
+            id : this.id ,
+            title : this.title ,
+            author : this.author,
+            rating : this.rating,
+            image : this.image,
+            description : this.description,
+            prices : this.prices,
+            tags : this.tags,
+        }
+    }
+    static fromJSON(json) {
+        return new Book(json);
+    }
+
 }

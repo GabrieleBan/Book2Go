@@ -1,26 +1,20 @@
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Edit } from "lucide-react";
-import {useAuth} from "@/components/auth-provider.jsx";
+import {Context} from "@/components/context-provider.jsx";
 
 import ProfileActions from "@/components/profile-actions";
 import AppHeader from "@/components/AppHeader";
 
 import User from "@/classes/User.js";
 export default function ProfilePage() {
-    let { user } = useAuth();
-
-    // If not logged in
-    if (!user) {
-        user = new User({
-            name: "Mario",
-            surname: "Rossi",
-            email: "mario.rossi@example.com",
-            number: "+39 333 1234567",
-        });
-    }//return <p className="p-4">Please log in to view your profile.</p>;
-
-
+    let { user } = Context();
+    if(!user) return (
+        <div className=" w-screen bg-beige-100 items-center flex flex-col">
+            <AppHeader />
+            <h1 className="text-red">Errore</h1>
+            <h2>Effettua il login</h2>
+        </div>);
     return (
         <div className=" w-screen bg-beige-100 flex flex-col">
             <AppHeader />
@@ -32,7 +26,7 @@ export default function ProfilePage() {
                     <div>
                         <img
                             src={user.avatar || "/user-avatar.png"}
-                            alt={user.name + " " + user.surname}
+                            alt={user.username}
                             className="h-40 w-40 rounded-full object-cover"
                         />
                         <Edit className="relative right-0 h-8 w-8 bg-white rounded-full p-1 cursor-pointer" />
@@ -42,7 +36,7 @@ export default function ProfilePage() {
                     <div className="flex-1 flex flex-col justify-between">
                         <div className="flex-row">
                             <h2 className="text-4xl font-semibold">
-                                {user.name} {user.surname}
+                                {user.username}
                             </h2>
                             <p className="text-gray-600 mt-2">
                                 Email: <span className="font-medium">{user.email}</span>
@@ -55,7 +49,7 @@ export default function ProfilePage() {
                         <div className="mt-6 md:mt-0 flex-1">
                             <Textarea
                                 placeholder="Bio..."
-                                value={user.bio || ""}
+                                defaultValue={user.bio || ""}
                                 className="w-full h-[20vh]"
                             />
                             <div className="mt-2 text-sm text-gray-500">
