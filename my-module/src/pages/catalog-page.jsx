@@ -22,108 +22,60 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { useEffect, useState, useMemo } from "react";
 import BookSummary from "@/classes/BookSummary.js";
+import Tag from "@/classes/Tag.js";
 import SearchableTags from "@/components/searchable-tags.jsx";
+import {Card} from "@/components/ui/card.js";
+import { useSearchParams} from "react-router-dom";
 
-export default function CatalogPage() {
-    // Example books
-    const tagsArray = [
-        "Avventura",
-        "Storia",
-        "Classico",
-        "Fantascienza",
-        "Romantico",
-        "Horror",
-        "Thriller",
-    ];
-
+export default function CatalogPage({ initialSelectedTags = [] }) {
     const [selectedTags, setSelectedTags] = useState([]);
+    const [tagsArray, setTagsArray] = useState([]);
+    const [books, setBooks] = useState([]);
+    const [searchParams] = useSearchParams();
+    const searchBarInput = searchParams.get("name") || "";
 
-    const books = [
-        new BookSummary({
-            id: 1,
-            title: "The Silent Horizon",
-            author: "Elena Moretti",
-            rating: 5,
-            prices: { Fisico: 10, Digitale: 1 },
-            image: "/placeholder-book.jpg",
-            description: "An epic tale of survival and hope, following the journey of a young protagonist who is forced to confront the limits of courage and endurance. Through trials of isolation, unexpected friendships, and moments of deep despair, the book paints a vivid portrait of what it truly means to find meaning in adversity. Readers are invited into a richly detailed world where every choice carries weight and consequences ripple far beyond the moment.",
-            tags: ["Avventura", "Drammatico", "Sopravvivenza"]
-        }),
-        new BookSummary({
-            id: 2,
-            title: "Whispers of the City",
-            author: "Giovanni Ricci",
-            rating: 4,
-            prices: { Fisico: 12 },
-            image: "/placeholder-book.jpg",
-            description: "Set against the backdrop of a city caught between tradition and modernity, this novel weaves together the stories of strangers whose paths intertwine in unexpected ways. Exploring themes of memory, forgiveness, and the quiet strength of human bonds, it challenges readers to reflect on their own relationships and the unspoken moments that shape them. With prose both delicate and powerful, the book resonates long after the final page.",
-            tags: ["Storia", "Romantico", "Drammatico"]
-        }),
-        new BookSummary({
-            id: 3,
-            title: "Shadows Across the Steppe",
-            author: "Anya Volkov",
-            rating: 5,
-            prices: { Fisico: 15 },
-            image: "/placeholder-book.jpg",
-            description: "A gripping adventure that blends mystery, danger, and the relentless pursuit of truth. The protagonist, torn between loyalty and personal ambition, embarks on a journey across unforgiving landscapes where every step reveals new secrets. With masterfully crafted suspense, this novel keeps readers at the edge of their seats, challenging them to untangle riddles that reach back into forgotten histories and hidden legacies.",
-            tags: ["Avventura", "Mistero", "Thriller"]
-        }),
-        new BookSummary({
-            id: 4,
-            title: "Echoes of Yesterday",
-            author: "Marta Pellegrini",
-            rating: 3,
-            prices: { Fisico: 8 },
-            image: "/placeholder-book.jpg",
-            description: "This introspective narrative delves into the complexities of choice, regret, and the lingering shadows of the past. Following the life of a character haunted by missed opportunities, the novel examines how a single decision can shape decades of experience. Through poignant storytelling and vivid emotional depth, it captures the fragile beauty of human resilience in the face of inevitable mistakes.",
-            tags: ["Storia", "Drammatico", "Riflessivo"]
-        }),
-        new BookSummary({
-            id: 5,
-            title: "The Garden of Ashes",
-            author: "Lorenzo De Santis",
-            rating: 4,
-            prices: { Fisico: 9 },
-            image: "/placeholder-book.jpg",
-            description: "A moving exploration of love, grief, and the search for redemption. The narrative follows intertwined lives across generations, showing how bonds of family and friendship can both wound and heal. With lyrical prose and heart-stirring imagery, this book invites readers to consider the quiet heroism of forgiveness and the ways in which healing often comes from the most unexpected sources.",
-            tags: ["Romantico", "Drammatico", "Famiglia"]
-        }),
-        new BookSummary({
-            id: 6,
-            title: "Fragments of Tomorrow",
-            author: "Clara Bianchi",
-            rating: 3,
-            prices: { Fisico: 8 },
-            image: "/placeholder-book.jpg",
-            description: "A character-driven story about identity, ambition, and the long journey toward self-acceptance. Through the lens of a protagonist navigating conflicting expectations, the novel explores the fragile balance between personal dreams and societal pressures. Rich in psychological depth, it illuminates the struggles of becoming while underscoring the quiet victories that define true growth.",
-            tags: ["Filosofico", "Riflessivo", "Drammatico"]
-        }),
-        new BookSummary({
-            id: 7,
-            title: "The House of Secrets",
-            author: "Francesco Vitale",
-            rating: 3,
-            prices: { Fisico: 8 },
-            image: "/placeholder-book.jpg",
-            description: "Suspenseful and deeply atmospheric, this book plunges the reader into a labyrinth of secrets where truth hides behind carefully constructed lies. Every chapter peels back another layer of deception, building toward a revelation that is as shocking as it is inevitable. It is both a thriller and a meditation on trust, exploring how even the closest relationships can harbor devastating betrayals.",
-            tags: ["Thriller", "Mistero", "Suspense"]
-        }),
-        new BookSummary({
-            id: 8,
-            title: "A River Between Worlds",
-            author: "Isabella Conti",
-            rating: 4,
-            prices: { Fisico: 11 },
-            image: "/placeholder-book.jpg",
-            description: "A sweeping saga spanning continents and decades, this novel traces the fortunes of a family bound together by love yet torn apart by ambition and circumstance. With a narrative that shifts seamlessly between intimate personal moments and grand historical events, it offers a profound exploration of heritage, identity, and the unyielding power of hope. The story resonates as both a personal journey and a universal reflection on belonging.",
-            tags: ["Storia", "Famiglia", "Drammatico"]
-        })
-    ];
+    console.log("search bar", searchBarInput);
+    const [name, setName]= useState(searchBarInput)
+    useEffect(() => {
+        setName(searchBarInput);
+    }, [searchBarInput]);
+    // Carica i tag all'avvio
+    useEffect(() => {
+        async function loadTags() {
+            const tags = await Tag.fetchAll();
+            setTagsArray(tags);
+
+            if (initialSelectedTags.length === 0) return;
+
+            // Normalizza tutto in oggetti {id, name}
+            const normalized = initialSelectedTags
+                .map(sel => {
+                    if (typeof sel === "object" && sel.id && sel.name) return sel;
+                    const match = tags.find(t => t.id === sel || t.name === sel);
+                    return match ? { id: match.id, name: match.name } : null;
+                })
+                .filter(Boolean);
+
+            setSelectedTags(normalized);
+        }
+
+        loadTags();
+    }, []);
+
+    // Carica i libri all'avvio o quando cambiano i tag selezionati
+    useEffect(() => {
+        async function loadBooks() {
+            const categoryIds = selectedTags.map(t => t.id);
+            console.log("Caricamento libri con categoryIds:", categoryIds); // <-- debug
+            const fetchedBooks = await BookSummary.fetchAll(name, categoryIds);
+            console.log("Libri fetchati:", fetchedBooks); // <-- debug
+            setBooks(fetchedBooks);
+        }
+        loadBooks();
+    }, [name,selectedTags]);
 
     // Filters
     const [search, setSearch] = useState("");
-
     const [selectedFormat, setSelectedFormat] = useState([]);
     const [priceRange, setPriceRange] = useState([0, 100]);
     const [sortBy, setSortBy] = useState("recent");
@@ -134,34 +86,31 @@ export default function CatalogPage() {
     // Track responsive column count to enforce 4 rows max
     useEffect(() => {
         function updateColumns() {
-            if (window.innerWidth < 640) setColumns(2); // sm
-            else if (window.innerWidth < 768) setColumns(3); // md
-            else if (window.innerWidth < 1024) setColumns(4); // lg
-            else setColumns(5); // xl+
+            if (window.innerWidth < 640) setColumns(2);
+            else if (window.innerWidth < 768) setColumns(3);
+            else if (window.innerWidth < 1024) setColumns(4);
+            else setColumns(5);
         }
         updateColumns();
         window.addEventListener("resize", updateColumns);
         return () => window.removeEventListener("resize", updateColumns);
     }, []);
 
-    const showCount = columns * 4; // always 4 rows max
+    const showCount = columns * 4;
 
     // Filtered + sorted books
     const filteredBooks = useMemo(() => {
         let result = books.filter((b) => {
-
-
             const matchesSearch = b.title.toLowerCase().includes(search.toLowerCase());
 
-            // Filter by tags
-            const matchesTags = selectedTags.length === 0 || (b.tags && selectedTags.some((tag) => b.tags.includes(tag)));
+            const matchesTags =
+                selectedTags.length === 0 ||
+                selectedTags.some((tag) => b.tags.includes(tag.name));
 
-            // Filter by format
             const matchesFormat =
                 selectedFormat.length === 0 ||
                 selectedFormat.some((format) => b.prices[format] != null);
 
-            // Filter by price
             const bookMinPrice = Math.min(...Object.values(b.prices).filter((p) => p !== null));
             const bookMaxPrice = Math.max(...Object.values(b.prices).filter((p) => p !== null));
             const matchesPrice = bookMinPrice <= priceRange[1] && bookMaxPrice >= priceRange[0];
@@ -169,7 +118,6 @@ export default function CatalogPage() {
             return matchesSearch && matchesTags && matchesFormat && matchesPrice;
         });
 
-        // Sorting
         if (sortBy === "price-asc") {
             result = [...result].sort((a, b) => {
                 const aMin = Math.min(...Object.values(a.prices).filter((p) => p !== null));
@@ -189,28 +137,53 @@ export default function CatalogPage() {
         return result;
     }, [books, search, selectedTags, selectedFormat, priceRange, sortBy]);
 
-    // Pagination
     const totalPages = Math.ceil(filteredBooks.length / showCount);
     const paginatedBooks = filteredBooks.slice((page - 1) * showCount, page * showCount);
-
-
+    const toggleTag = (tag) => {
+        setSelectedTags((prev) =>
+            prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+        );
+    };
     return (
         <div className="w-screen bg-white flex flex-col">
             <AppHeader />
+            <div className="flex flex-wrap gap-2 mb-6">
+                {/* Nome della ricerca */}
+                {name && (
+                    <Card
+                        key="search-name"
+                        className="px-3 py-1 cursor-pointer bg-[#F5E7D2] text-black font-semibold"
+                        onClick={() => {
+                            setName("")
+                        }}
+                    >
+                        "{name}"
+                    </Card>
+                )}
+
+                {/* Tags selezionati */}
+                {selectedTags.map((tag) => (
+                    <Card
+                        key={tag.id} // id unico
+                        className="px-3 py-1 cursor-pointer bg-[#F5E7D2] text-black"
+                        onClick={() =>
+                            setSelectedTags((prev) => prev.filter((t) => t.id !== tag.id)) // Rimuove il tag cliccato
+                        }
+                    >
+                        {tag.name}
+                    </Card>
+                ))}
+            </div>
 
             <main className="flex flex-1 px-4 md:px-8 py-6 gap-6">
-                {/* Sidebar filters */}
                 <aside className="max-w-64 ">
-
-
-                        <h3 className="font-semibold mb-2">Tags</h3>
-                        <SearchableTags
-                            tags={tagsArray}
-                            selectedTags={selectedTags}
-                            setSelectedTags={setSelectedTags}
-                            maxVisible={6}
-                        />
-
+                    <h3 className="font-semibold mb-2">Tags</h3>
+                    <SearchableTags
+                        tags={tagsArray}
+                        selectedTags={selectedTags}
+                        setSelectedTags={setSelectedTags}
+                        maxVisible={6}
+                    />
 
                     <h3 className="font-semibold mt-4 mb-2">Formato</h3>
                     {["Fisico", "Digitale", "Audiolibro"].map((format) => (
@@ -219,7 +192,9 @@ export default function CatalogPage() {
                                 id={format}
                                 checked={selectedFormat.includes(format)}
                                 onCheckedChange={(checked) => {
-                                    setSelectedFormat((prev) => (checked ? [...prev, format] : prev.filter((f) => f !== format)));
+                                    setSelectedFormat((prev) =>
+                                        checked ? [...prev, format] : prev.filter((f) => f !== format)
+                                    );
                                 }}
                             />
                             <label htmlFor={format}>{format}</label>
@@ -227,15 +202,19 @@ export default function CatalogPage() {
                     ))}
 
                     <h3 className="font-semibold mt-4 mb-2">Prezzo</h3>
-                    <Slider min={0} max={1000} step={1} defaultValue={priceRange} onValueChange={(val) => setPriceRange(val)} />
+                    <Slider
+                        min={0}
+                        max={1000}
+                        step={1}
+                        defaultValue={priceRange}
+                        onValueChange={(val) => setPriceRange(val)}
+                    />
                     <p className="text-sm text-gray-600">
                         {priceRange[0]} € - {priceRange[1]} €
                     </p>
                 </aside>
 
-                {/* Main content */}
                 <section className="flex-1 flex flex-col">
-                    {/* Search + Sort/Show */}
                     <div className="flex flex-col md:flex-row gap-4 mb-6 items-center justify-between">
                         <Input
                             placeholder="Cerca..."
@@ -257,7 +236,6 @@ export default function CatalogPage() {
                                 </SelectContent>
                             </Select>
 
-                            {/* Show mode instead of number */}
                             <Select defaultValue={showMode} onValueChange={setShowMode}>
                                 <SelectTrigger className="w-32">
                                     <SelectValue placeholder="Show" />
@@ -270,8 +248,8 @@ export default function CatalogPage() {
                             </Select>
                         </div>
                     </div>
-                    {/* Griglia libri */}
-                    <div className="flex flex-wrap  gap-8">
+
+                    <div className="flex flex-wrap gap-8">
                         {paginatedBooks.map((book) => (
                             <div key={book.id} className="w-[180px]">
                                 <BookCard book={book} />
@@ -279,7 +257,6 @@ export default function CatalogPage() {
                         ))}
                     </div>
 
-                    {/* Pagination */}
                     <div className="mt-6 flex justify-center">
                         <Pagination>
                             <PaginationContent>

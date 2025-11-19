@@ -1,4 +1,4 @@
-import Category from "@/classes/Category.js";
+import Tag from "@/classes/Tag.js";
 import {Card} from "@/components/ui/card";
 import {
     HoverCard,

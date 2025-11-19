@@ -8,8 +8,6 @@ export default class BookDetails {
                     description,
                     prices,
                     tags,
-
-                    // Nuove proprietà complete dal JSON
                     isbn,
                     publisher,
                     publicationDate,
@@ -17,7 +15,6 @@ export default class BookDetails {
                     categories,
                     availableFormats
                 }) {
-        // Proprie originali
         this.id = id;
         this.title = title;
         this.author = author;
@@ -26,8 +23,6 @@ export default class BookDetails {
         this.description = description;
         this.prices = prices;
         this.tags = tags;
-
-        // Nuove proprietà
         this.isbn = isbn;
         this.publisher = publisher;
         this.publicationDate = publicationDate;
@@ -36,7 +31,6 @@ export default class BookDetails {
         this.availableFormats = availableFormats;
     }
 
-    // Manteniamo la firma esistente
     getPrice(format = "Fisico") {
         return this.prices?.[format] || null;
     }
@@ -55,8 +49,6 @@ export default class BookDetails {
             description: this.description,
             prices: this.prices,
             tags: this.tags,
-
-            // Tutti i nuovi campi
             isbn: this.isbn,
             publisher: this.publisher,
             publicationDate: this.publicationDate,
@@ -67,42 +59,41 @@ export default class BookDetails {
     }
 
     static fromJSON(json) {
-        // Mappa in formato dei vecchi "prices"
         const prices = {};
         if (json.availableFormats) {
-            const map = {
-                PHYSICAL: "Fisico",
-                EBOOK: "Digitale",
-                AUDIOBOOK: "Audiolibro"
-            };
+            const map = { PHYSICAL: "Fisico", EBOOK: "Digitale", AUDIOBOOK: "Audiolibro" };
             json.availableFormats.forEach(f => {
                 const key = map[f.formatType];
                 if (key) prices[key] = f.purchasePrice ?? null;
             });
         }
 
-        // Mappa "categories" → "tags" (solo nomi)
-        const tags = json.categories
-            ? json.categories.map(c => c.name)
-            : [];
+        const tags = json.categories?.map(c => c.name) || [];
 
         return new BookDetails({
-            id: json.id,
-            title: json.title,
-            author: json.author,
+            id: json.id ?? "0",
+            title: json.title ?? "Untitled",
+            author: json.author ?? "Unknown",
             rating: json.rating ?? 0,
-            image: json.coverImageUrl,
-            description: json.description,
+            image: json.coverImageUrl ?? "/placeholder-book.jpg",
+            description: json.description ?? "",
             prices,
             tags,
-
-            // Nuovi campi completi
-            isbn: json.isbn,
-            publisher: json.publisher,
-            publicationDate: json.publicationDate,
-            coverImageUrl: json.coverImageUrl,
-            categories: json.categories,
-            availableFormats: json.availableFormats
+            isbn: json.isbn ?? "",
+            publisher: json.publisher ?? "",
+            publicationDate: json.publicationDate ?? "",
+            coverImageUrl: json.coverImageUrl ?? "/placeholder-book.jpg",
+            categories: json.categories ?? [],
+            availableFormats: json.availableFormats ?? []
         });
+    }
+
+    // --- NUOVA FUNZIONE STATICA ---
+    static async fetchById(id) {
+        if (!id) throw new Error("Book ID is required");
+        const res = await fetch(`http://localhost:8091/books/${id}`);
+        if (!res.ok) throw new Error(`Failed to fetch book with id ${id}`);
+        const data = await res.json();
+        return BookDetails.fromJSON(data);
     }
 }
