@@ -35,7 +35,7 @@ export default function BookPage() {
             try {
                 const detailedBook = await BookDetails.fetchById(lastBook.id);
                 setBook(detailedBook);
-                rememberBook(detailedBook); // aggiorna context
+
             } catch (err) {
                 console.error("Errore fetch book details:", err);
                 // fallback
@@ -44,7 +44,7 @@ export default function BookPage() {
         }
 
         loadBook();
-    }, [lastBook, rememberBook]);
+    }, [lastBook]);
 
     // Fallback book se fetch non è pronta
     const testBook = new BookDetails({
