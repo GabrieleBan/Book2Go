@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import Book from "@/classes/Book.js";
+import BookDetails from "@/classes/BookDetails.js";
 
 // helper for localStorage sync
 const usePersistentState = (key, defaultValue, parser = JSON.parse) => {
@@ -30,7 +30,7 @@ export const ContextProvider = ({ children }) => {
     const [lastBook, setLastBook] = usePersistentState(
         "lastBook",
         null,
-        (saved) => Book.fromJSON(JSON.parse(saved)) // restore Book instance
+        (saved) => BookDetails.fromJSON(JSON.parse(saved)) // restore Book instance
     );
 
     const login = (userData) => setUser(userData);
@@ -80,7 +80,7 @@ export const ContextProvider = ({ children }) => {
     const updateUser = (updates) => setUser((prev) => ({ ...prev, ...updates }));
 
     const rememberBook = (book) => {
-        const b = book instanceof Book ? book : new Book(book);
+        const b = book instanceof BookDetails ? book : new BookDetails(book);
         setLastBook(b); // saved in localStorage automatically
     };
 

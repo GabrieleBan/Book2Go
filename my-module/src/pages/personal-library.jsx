@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Clock, BookOpen } from "lucide-react";
-import Book from "@/classes/Book.js";
+
 import LibraryBook from "@/classes/LibraryBook.js";
 
 const sampleTitles = [

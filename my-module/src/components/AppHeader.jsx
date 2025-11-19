@@ -64,7 +64,7 @@ export default function AppHeader({ avatarSrc }) {
                 <div className="flex items-center justify-center flex-1">
                     <Link to="/">
                         <img
-                            src="/src/assets/icon-only.png"
+                            src="/trash/src/assets/icon-only.png"
                             alt="Logo"
                             className="h-8 w-8 mr-2"
                         />

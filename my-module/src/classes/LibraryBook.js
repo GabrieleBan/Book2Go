@@ -1,6 +1,6 @@
-import Book from "@/classes/Book.js";
+import BookSummary from "@/classes/BookSummary.js";
 
-export default class LibraryBook extends Book {
+export default class LibraryBook extends BookSummary {
     constructor({ format, owned, lent, expireDate, tags, ...bookProps }) {
         super(bookProps); // pass id, title, author, rating, image, description, prices
         this.format = format || "Fisico";

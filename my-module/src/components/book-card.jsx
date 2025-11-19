@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Context } from "@/components/context-provider.jsx";
 import { useNavigate } from "react-router-dom";
-import Book from "@/classes/Book.js";
+import BookSummary from "@/classes/BookSummary.js";
 
 export default function BookCard({ book }) {
     const { rememberBook } = Context();

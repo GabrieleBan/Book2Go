@@ -16,7 +16,8 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel.js";
 import StarRating from "@/components/star-rating.jsx";
-import Book from "@/classes/Book.js";
+import BookDetails from "@/classes/BookDetails.js";
+import BookSummary from "@/classes/BookSummary.js";
 
 export default function BookPage() {
     const [rating, setRating] = useState(0);
@@ -25,7 +26,7 @@ export default function BookPage() {
         window.scrollTo(0, 0);
     }, []);
     // fallback book if lastBook is null
-    const testBook = new Book({
+    const testBook = new BookDetails({
         title: "Dante",
         author: "Alessandro Barbero",
         rating: 4.9,
@@ -35,11 +36,11 @@ export default function BookPage() {
         prices: { Fisico: 33.5, Digitale: 12.0, Audiolibro: 3.0 },
     });
 
-    const book = lastBook instanceof Book ? lastBook : testBook;
+    const book = lastBook instanceof BookDetails ? lastBook : testBook;
 
     // Recommendations as Book instances
     const recommendations = [
-        new Book({
+        new BookSummary({
             id: 1,
             title: "The Silent Horizon",
             author: "Elena Moretti",
@@ -49,7 +50,7 @@ export default function BookPage() {
             description: "An epic tale of survival and hope, following the journey of a young protagonist who is forced to confront the limits of courage and endurance. Through trials of isolation, unexpected friendships, and moments of deep despair, the book paints a vivid portrait of what it truly means to find meaning in adversity. Readers are invited into a richly detailed world where every choice carries weight and consequences ripple far beyond the moment.",
             tags: ["Avventura", "Drammatico", "Sopravvivenza"]
         }),
-        new Book({
+        new BookSummary({
             id: 2,
             title: "Whispers of the City",
             author: "Giovanni Ricci",
@@ -59,7 +60,7 @@ export default function BookPage() {
             description: "Set against the backdrop of a city caught between tradition and modernity, this novel weaves together the stories of strangers whose paths intertwine in unexpected ways. Exploring themes of memory, forgiveness, and the quiet strength of human bonds, it challenges readers to reflect on their own relationships and the unspoken moments that shape them. With prose both delicate and powerful, the book resonates long after the final page.",
             tags: ["Storia", "Romantico", "Drammatico"]
         }),
-        new Book({
+        new BookSummary({
             id: 3,
             title: "Shadows Across the Steppe",
             author: "Anya Volkov",
@@ -69,7 +70,7 @@ export default function BookPage() {
             description: "A gripping adventure that blends mystery, danger, and the relentless pursuit of truth. The protagonist, torn between loyalty and personal ambition, embarks on a journey across unforgiving landscapes where every step reveals new secrets. With masterfully crafted suspense, this novel keeps readers at the edge of their seats, challenging them to untangle riddles that reach back into forgotten histories and hidden legacies.",
             tags: ["Avventura", "Mistero", "Thriller"]
         }),
-        new Book({
+        new BookSummary({
             id: 4,
             title: "Echoes of Yesterday",
             author: "Marta Pellegrini",
@@ -79,7 +80,7 @@ export default function BookPage() {
             description: "This introspective narrative delves into the complexities of choice, regret, and the lingering shadows of the past. Following the life of a character haunted by missed opportunities, the novel examines how a single decision can shape decades of experience. Through poignant storytelling and vivid emotional depth, it captures the fragile beauty of human resilience in the face of inevitable mistakes.",
             tags: ["Storia", "Drammatico", "Riflessivo"]
         }),
-        new Book({
+        new BookSummary({
             id: 5,
             title: "The Garden of Ashes",
             author: "Lorenzo De Santis",
@@ -89,7 +90,7 @@ export default function BookPage() {
             description: "A moving exploration of love, grief, and the search for redemption. The narrative follows intertwined lives across generations, showing how bonds of family and friendship can both wound and heal. With lyrical prose and heart-stirring imagery, this book invites readers to consider the quiet heroism of forgiveness and the ways in which healing often comes from the most unexpected sources.",
             tags: ["Romantico", "Drammatico", "Famiglia"]
         }),
-        new Book({
+        new BookSummary({
             id: 6,
             title: "Fragments of Tomorrow",
             author: "Clara Bianchi",
@@ -99,7 +100,7 @@ export default function BookPage() {
             description: "A character-driven story about identity, ambition, and the long journey toward self-acceptance. Through the lens of a protagonist navigating conflicting expectations, the novel explores the fragile balance between personal dreams and societal pressures. Rich in psychological depth, it illuminates the struggles of becoming while underscoring the quiet victories that define true growth.",
             tags: ["Filosofico", "Riflessivo", "Drammatico"]
         }),
-        new Book({
+        new BookSummary({
             id: 7,
             title: "The House of Secrets",
             author: "Francesco Vitale",
@@ -109,7 +110,7 @@ export default function BookPage() {
             description: "Suspenseful and deeply atmospheric, this book plunges the reader into a labyrinth of secrets where truth hides behind carefully constructed lies. Every chapter peels back another layer of deception, building toward a revelation that is as shocking as it is inevitable. It is both a thriller and a meditation on trust, exploring how even the closest relationships can harbor devastating betrayals.",
             tags: ["Thriller", "Mistero", "Suspense"]
         }),
-        new Book({
+        new BookSummary({
             id: 8,
             title: "A River Between Worlds",
             author: "Isabella Conti",
@@ -139,7 +140,7 @@ export default function BookPage() {
     ];
 
     return (
-        <div className="min-h-screen w-full overflow-x-hidden flex flex-col">
+        <div className="min-h-screen w-full overflow-x-hidden flex flex-col bg-white">
             <AppHeader />
 
             <main className="flex-1 w-full px-4 py-6 space-y-12 overflow-y-auto box-border">

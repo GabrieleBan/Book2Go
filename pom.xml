@@ -21,8 +21,8 @@
 
     <!-- Modules -->
     <modules>
-        <module>LendService</module>
-        <module>ReaderService</module>
+<!--        <module>LendService</module>-->
+<!--        <module>ReaderService</module>-->
 
     </modules>
 
