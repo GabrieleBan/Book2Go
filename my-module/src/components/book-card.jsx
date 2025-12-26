@@ -27,7 +27,8 @@ export default function BookCard({ book }) {
 
             <div className="mt-2 text-center">
                 <p className="font-medium">{book.title ?? "Untitled"}</p>
-                <p className="text-sm text-gray-600">{book.author ?? "Unknown"}</p>
+                <p className="text-sm text-gray-700">{book.author ?? "Unknown"}</p>
+                <p className="text-sm text-gray-600">{book.publisher ?? "Unknown"}</p>
                 <p className="text-yellow-500">{book.getStars()}</p>
                 <p className="font-medium">{book.getPrice("Fisico")} €</p>
             </div>

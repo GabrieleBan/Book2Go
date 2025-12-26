@@ -1,9 +1,11 @@
+import { API } from "@/utils/api.js";
 export default class BookSummary {
     constructor({
                     id,
                     title,
                     author,
-                    rating = null,
+                    publisher = "Unknown",
+                    rating = 0,
                     prices = {},
                     image = null,
                     coverImageUrl = null,
@@ -14,10 +16,13 @@ export default class BookSummary {
         this.id = id ?? "0";
         this.title = title ?? "Untitled";
         this.author = author ?? "Unknown";
+        this.publisher = publisher ?? "Unknown";
         this.rating = rating ?? 0;
         this.prices = prices ?? {};
+
         this.image = image ?? "/placeholder-book.jpg";
         this.coverImageUrl = coverImageUrl ?? "/placeholder-book.jpg";
+
         this.description = description ?? "";
         this.tags = tags ?? [];
         this.categories = categories ?? [];
@@ -27,7 +32,17 @@ export default class BookSummary {
         return this.rating ? "★".repeat(Math.floor(this.rating)) : "";
     }
 
-    getPrice(format = "Fisico") {
+    /**
+     * Restituisce il prezzo per formato
+     * @param {string} format - "PHYSICAL", "EBOOK", "AUDIOBOOK"
+     * @returns {number|null}
+     */
+    getPrice(format = "PHYSICAL") {
+        if (format === "Fisico") {
+            // Ritorna il prezzo più alto tra tutti i formati
+            const values = Object.values(this.prices);
+            return values.length > 0 ? Math.max(...values) : null;
+        }
         return this.prices?.[format] ?? null;
     }
 
@@ -37,6 +52,7 @@ export default class BookSummary {
             id: this.id,
             title: this.title,
             author: this.author,
+            publisher: this.publisher,
             rating: this.rating,
             prices: this.prices,
             image: this.image,
@@ -54,9 +70,10 @@ export default class BookSummary {
         return new BookSummary({
             id: json.id ?? "0",
             title: json.title ?? "Untitled",
-            author: json.author ?? "Unknown",
+            author: json.authors ?? json.author ?? "Unknown",
+            publisher: json.publisher ?? "Unknown",
             rating: json.rating ?? 0,
-            prices: json.prices ?? { Fisico: 0, Digitale: 0, Audiolibro: 0 },
+            prices: json.prices ?? { PHYSICAL: 0, EBOOK: 0, AUDIOBOOK: 0 },
             image: json.image ?? json.coverImageUrl ?? "/placeholder-book.jpg",
             coverImageUrl: json.coverImageUrl ?? "/placeholder-book.jpg",
             description: json.description ?? "",
@@ -64,6 +81,7 @@ export default class BookSummary {
             categories
         });
     }
+
     /**
      * Fetch books optionally filtered by name and category IDs
      * @param {string} [name] - Optional substring to filter book titles
@@ -72,15 +90,14 @@ export default class BookSummary {
      */
     static async fetchAll(name = "", categoryIds = []) {
         try {
-            const apiEndpoint = "http://localhost:8091/books/";
+            const apiEndpoint = `${API.BOOK}/books/`;
+            console.log(apiEndpoint)
             const params = new URLSearchParams();
 
-            // Aggiungi categoryIds se presenti
             if (categoryIds.length > 0) {
                 params.append("categoryIds", categoryIds.join(","));
             }
 
-            // Aggiungi name se non è vuoto
             if (name.trim()) {
                 params.append("name", name.trim());
             }
@@ -91,8 +108,7 @@ export default class BookSummary {
             if (!res.ok) throw new Error("Errore nel fetch dei libri");
 
             const data = await res.json();
-            console.log(data)
-            return data.map((b) => BookSummary.fromJSON(b));
+            return data.map(b => BookSummary.fromJSON(b));
         } catch (err) {
             console.error(err);
             return [];

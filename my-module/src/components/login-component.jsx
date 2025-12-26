@@ -12,8 +12,7 @@ import {
 import {Context} from "@/components/context-provider.jsx";
 import {Input} from "@/components/ui/input.js";
 import User from "@/classes/User.js";
-
-
+import {API} from "@/utils/api.js";
 
 
 export function LoginComponent({ setShowLogin }) {
@@ -23,7 +22,7 @@ export function LoginComponent({ setShowLogin }) {
     const navigate= useNavigate();
     const { saveTokens }=Context();
     function handleLogin(usrname,pssword) {
-        fetch("http://localhost:8090/auth/login",{
+        fetch(`${API.AUTH}/auth/login`,{
             method:"POST",
             body: JSON.stringify({
                 username:usrname,
@@ -44,7 +43,7 @@ export function LoginComponent({ setShowLogin }) {
                         refreshToken: tokenData.refreshToken,
                     })
                     console.log("token received correctly");
-                    retrieveUserData()
+                    retrieveUserData(tokenData.accessToken)
                     setShowLogin(false);
                 })
 
@@ -56,13 +55,16 @@ export function LoginComponent({ setShowLogin }) {
 
 
     }
-    async function retrieveUserData() {
-        //da implementare
-        login(new User({
-            username: "Mario",
-            email: "mario.rossi@example.com",
-            number: "+39 333 1234567",
-        }))
+    async function retrieveUserData(token) {
+
+        if (!token) return;
+
+        const user = await User.fetchMe(token);
+
+        if (user) {
+            console.log("Utente loggato:", user);
+            login(user)
+        }
     }
     function showError2User(errData) {
         const userError=document.getElementById("userError");
@@ -133,7 +135,7 @@ export function LoginComponent({ setShowLogin }) {
         const top = window.screenY + (window.outerHeight - height) / 2;
 
         const popup = window.open(
-            "http://localhost:8090/oauth2/authorization/google",
+            `${API.AUTH}/oauth2/authorization/google`,
             "googleLogin",
             `width=${width},height=${height},left=${left},top=${top}`
         );
@@ -153,7 +155,7 @@ export function LoginComponent({ setShowLogin }) {
 
                 console.log(event.data.refreshToken)
                 // Close popup
-                retrieveUserData()
+                retrieveUserData(event.data.accessToken)
                 setShowLogin(false)
 
             }else{console.log("ho ricevuto",event)}

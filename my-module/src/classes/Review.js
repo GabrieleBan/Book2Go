@@ -1,3 +1,4 @@
+import {API} from "@/utils/api.js";
 
 export default class Review {
     constructor({
@@ -45,7 +46,7 @@ export default class Review {
     }
     static async postReview(authToken, reviewToPost) {
         // reviewToPost deve essere un oggetto con { bookId, overallScore, title, text }
-        const url = "http://localhost:8097/reviews/";
+        const url = `${API.REVIEW}/reviews/`;
 
         const res = await fetch(url, {
             method: "POST",
@@ -68,7 +69,7 @@ export default class Review {
         return await res.json();
     }
     static async fetchReviewByBookIdPaginated(bookId, page = 0, size = 10) {
-        const url = new URL(`http://localhost:8097/reviews/${bookId}`);
+        const url = new URL(`${API.REVIEW}/reviews/${bookId}`);
         url.searchParams.append("page", page);
         url.searchParams.append("size", size);
         url.searchParams.append("sort", "postedDate,desc");

@@ -19,11 +19,24 @@ import {
 import StarRating from "@/components/star-rating.jsx";
 import BookDetails from "@/classes/BookDetails.js";
 import BookSummary from "@/classes/BookSummary.js";
+import LendableFormat from "@/classes/LendableFormats.js";
+import LendComponent from "@/components/lend-component.jsx"
+import Subscriptions from "@/classes/Subscriptions.js";
 
 export default function BookPage() {
     const [book, setBook] = useState(null);
     const [rating, setRating] = useState(0);
     const { getTokens, lastBook } = Context();
+    const [lendableFormats, setLendableFormats] = useState([]);
+    const [lendOverlay, setLendOverlay] = useState({
+        open: false,
+        formatId: null,
+        formatType: null,
+    });
+
+    const { user }=Context();
+
+
 
 
     useEffect(() => {
@@ -47,6 +60,11 @@ export default function BookPage() {
 
         loadBook();
     }, [lastBook]);
+    useEffect(() => {
+        const token = getTokens()?.accessToken;
+        LendableFormat.fetchByBookId(lastBook?.id, token)
+            .then(setLendableFormats);
+    }, []);
 
     // Fallback book se fetch non è pronta
     const testBook = new BookDetails({
@@ -59,6 +77,7 @@ export default function BookPage() {
         prices: { Fisico: 33.5, Digitale: 12.0, Audiolibro: 3.0 },
         tags: ["Storia", "Medioevo", "Biografia"]
     });
+
 
     const bookToRender = book ?? testBook;
 
@@ -238,6 +257,7 @@ export default function BookPage() {
         }
     }
 
+
     return (
         <div className="min-h-screen w-full overflow-x-hidden flex flex-col bg-white">
             <AppHeader />
@@ -263,35 +283,97 @@ export default function BookPage() {
                         </div>
 
                         {/* Purchase Options */}
+
                         <div className="mt-6 w-full">
-                            <h5 className="font-semibold mb-2">Formati</h5>
-                            <RadioGroup defaultValue="Fisico">
+                            <h5 className="font-semibold mb-2">Formati acquistabili</h5>
+                            <div className="flex flex-col gap-2">
                                 {Object.entries(bookToRender.prices).map(([format, price]) => {
                                     if (price === null) return null;
                                     return (
-                                        <div
+                                        <button
                                             key={format}
-                                            className="flex items-center justify-between border p-2 rounded-md mb-2"
+                                            className="flex items-center justify-between w-full border p-2 rounded-md
+                               bg-white text-gray-800 border-gray-300
+                               hover:bg-black hover:text-white hover:border-black transition-colors duration-200"
+                                            onClick={() => {
+                                                // Mocked purchase action
+                                                console.log(`Acquisto formato ${format} a ${price.toFixed(2)} €`);
+                                            }}
                                         >
-                                            <div className="flex items-center gap-2">
-                                                <RadioGroupItem
-                                                    value={format}
-                                                    id={format}
-                                                    className="h-4 w-4 border border-gray-400 rounded-full
-                          data-[state=checked]:bg-black data-[state=checked]:border-black"
-                                                />
-                                                <label htmlFor={format}>{format}</label>
-                                            </div>
+                                            <span>{format}</span>
                                             <span>{price.toFixed(2)} €</span>
-                                        </div>
+                                        </button>
                                     );
                                 })}
-                            </RadioGroup>
-                            <div className="w-full flex items-center justify-end">
-                                <Button>Acquista</Button>
+                            </div>
+                        </div>
+                        {/*Formati per presitito o noleggio */}
+                        <div className="mt-6 w-full">
+                            <h5 className="font-semibold mb-2">Formati disponibili per il prestito</h5>
+
+                            <div className="flex flex-col gap-2">
+                                {lendableFormats.map(f => {
+                                    const isLogged = !!user;
+
+                                    const isAvailable = isLogged
+                                        ? Subscriptions.canAccessLendable(user.subscription, f.options)
+                                        : false;
+
+                                    const requiredTier = Subscriptions.getRequiredTier(f.options);
+
+                                    return (
+                                        <button
+                                            key={f.formatId}
+                                            disabled={!isAvailable}
+                                            title={
+                                                !isAvailable
+                                                    ? !isLogged
+                                                        ? "Accedi per usare il prestito"
+                                                        : `Necessario upgrade a ${requiredTier}`
+                                                    : ""
+                                            }
+                                            className={`relative flex items-center justify-between w-full border p-2 rounded-md transition-colors duration-200
+        ${
+                                                isAvailable
+                                                    ? "bg-white text-gray-800 border-gray-300 hover:bg-black hover:text-white hover:border-black"
+                                                    : "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
+                                            }`}
+                                            onClick={() => {
+                                                if (!isAvailable) return;
+
+                                                setLendOverlay({
+                                                    open: true,
+                                                    formatId: f.formatId,
+                                                    formatType: f.formatType,
+                                                });
+                                            }}
+                                        >
+                                            <span>{f.formatType}</span>
+                                            <span>Prestito</span>
+
+                                            {!isAvailable && (
+                                                <div className="absolute inset-0 bg-gray-300/40 rounded-md pointer-events-none" />
+                                            )}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>
+                    {lendOverlay.open && (
+                        <LendComponent
+                            formatId={lendOverlay.formatId}
+                            formatType={lendOverlay.formatType}
+                            userId={lendOverlay.userId}
+                            onClose={() =>
+                                setLendOverlay({
+                                    open: false,
+                                    formatId: null,
+                                    formatType: null,
+                                })
+                            }
+                        />
+                    )}
 
                     {/* Book Details */}
                     <div className="flex-1 min-w-0">
