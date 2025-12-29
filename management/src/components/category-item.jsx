@@ -1,0 +1,33 @@
+import Tag from "@/classes/Tag.js";
+import {Card} from "@/components/ui/card";
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/components/ui/hover-card"
+export default function CategoryItem({ category}) {
+    return (
+        <div className="w-full max-w-xs mx-auto">
+
+            <HoverCard>
+                <HoverCardTrigger asChild>
+                    <div>
+                        <h1 className="text-lg font-bold text-center line-clamp-2">
+                            {category.name}
+                        </h1>
+                        <p className="text-sm text-center text-gray-600 line-clamp-2">
+                            {category.description}
+                        </p>
+                    </div>
+
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                    <div className="space-y-1">
+                        <h4 className="text-sm font-semibold">{category.description}</h4>
+                    </div>
+
+                </HoverCardContent>
+            </HoverCard>
+        </div>
+    );
+}

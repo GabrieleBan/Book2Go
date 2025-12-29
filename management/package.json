@@ -3,11 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-
   "scripts": {
     "dev": "vite --mode dev",
     "build": "vite build --mode dev",
-    "prod": "vite --mode prod",
     "build:docker": "vite build --mode docker",
     "build:k8s": "vite build --mode kubernetes",
     "lint": "eslint .",
@@ -26,6 +24,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.542.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
