@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {Context} from "@/components/context-provider.jsx";
 import { API } from "@/utils/api.js";
-import User from "@/classes/User.js"
+import Staff from "@/classes/Staff.js";
 
 
 export default function StaffLoggingPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const { saveTokens, login } = Context();
+    const { saveTokens, login, selectedLibrary, setSelectedLibrary } = Context();
     const libraries = [
         {
             id: "00000000-0000-0000-0000-000000000001",
@@ -22,7 +22,7 @@ export default function StaffLoggingPage() {
             address: "Via Torino 45, Milano",
         },
     ];
-    const [selectedLibrary, setSelectedLibrary] = useState(libraries[0].id);
+
     const [showLibrarySelector, setShowLibrarySelector] = useState(false);
     const navigate = useNavigate();
     function decodeJWT(token) {
@@ -63,7 +63,8 @@ export default function StaffLoggingPage() {
                 refreshToken: tokenData.refreshToken,
             });
 
-            const user = await User.fetchMe(tokenData.accessToken);
+            const user = Staff.fromToken(tokenData.accessToken)
+            console.log("logged ",user)
             if (user) login(user);
 
 
@@ -106,7 +107,6 @@ export default function StaffLoggingPage() {
                 </button>
             </div>
             <div className="absolute bottom-4 bg-white shadow-md rounded p-3 cursor-pointer">
-                {/* Riquadro principale: mostra libreria selezionata */}
                 <div onClick={() => setShowLibrarySelector(!showLibrarySelector)}>
                     {libraries.find((lib) => lib.id === selectedLibrary)?.name || "Seleziona libreria"}
                 </div>
@@ -117,7 +117,7 @@ export default function StaffLoggingPage() {
                             <button
                                 key={lib.id}
                                 onClick={() => {
-                                    setSelectedLibrary(lib.id);
+                                    setSelectedLibrary(lib.id);   // <--- usa context
                                     setShowLibrarySelector(false);
                                 }}
                                 className={`text-left bg-white p-1 rounded ${

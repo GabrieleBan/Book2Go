@@ -27,6 +27,7 @@ const AppContext = createContext();
 export const ContextProvider = ({ children }) => {
     const [user, setUser] = usePersistentState("user", null);
     const [tokens, setTokens] = usePersistentState("tokens", null);
+    const [selectedLibrary, setSelectedLibrary] = usePersistentState("library", null);
     const [lastBook, setLastBook] = usePersistentState(
         "lastBook",
         null,
@@ -99,6 +100,8 @@ export const ContextProvider = ({ children }) => {
                 tokens,
                 saveTokens,
                 getTokens,
+                selectedLibrary,
+                setSelectedLibrary,
             }}
         >
             {children}
