@@ -5,6 +5,10 @@ import DashboardPage from "@/pages/dashboard-page.jsx";
 import LendPage from "@/pages/lend-management-page.jsx";
 
 import { Navigate } from "react-router-dom";
+import StaffLendingActionsPage from "@/pages/StaffLendingActionPage.jsx";
+import LendableBooksPage from "@/pages/LendableBooksPage.jsx";
+import StaffCatalogPage from "@/pages/StaffCatalogPage.jsx";
+import BookPage from "@/pages/book-page.jsx";
 
 function ProtectedRoute({ children }) {
     const { user } = Context();
@@ -37,6 +41,40 @@ export default function App() {
                             </ProtectedRoute>
                         }
                     />
+                    <Route
+                        path="/staff-lending-actions"
+                        element={
+                            <ProtectedRoute>
+                                <StaffLendingActionsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/lendable-books"
+                        element={
+                            <ProtectedRoute>
+                                <LendableBooksPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/catalog"
+                        element={
+                            <ProtectedRoute>
+                                <StaffCatalogPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/book"
+                        element={
+                            <ProtectedRoute>
+                                <BookPage />
+                            </ProtectedRoute>
+                        }
+                    />
+
 
 
                 </Routes>

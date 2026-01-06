@@ -8,7 +8,6 @@ export default class BookSummary {
                     rating = 0,
                     prices = {},
                     image = null,
-                    coverImageUrl = null,
                     description = "",
                     tags = [],
                     categories = []
@@ -21,7 +20,7 @@ export default class BookSummary {
         this.prices = prices ?? {};
 
         this.image = image ?? "/placeholder-book.jpg";
-        this.coverImageUrl = coverImageUrl ?? "/placeholder-book.jpg";
+
 
         this.description = description ?? "";
         this.tags = tags ?? [];
@@ -67,7 +66,7 @@ export default class BookSummary {
             rating: this.rating,
             prices: this.prices,
             image: this.image,
-            coverImageUrl: this.coverImageUrl,
+
             description: this.description,
             tags: this.tags,
             categories: this.categories
@@ -85,8 +84,6 @@ export default class BookSummary {
             publisher: json.publisher ?? "Unknown",
             rating: json.rating ?? 0,
             prices: json.prices ?? { PHYSICAL: 0, EBOOK: 0, AUDIOBOOK: 0 },
-            image: json.image ?? json.coverImageUrl ?? "/placeholder-book.jpg",
-            coverImageUrl: json.coverImageUrl ?? "/placeholder-book.jpg",
             description: json.description ?? "",
             tags,
             categories
@@ -142,5 +139,12 @@ export default class BookSummary {
             console.error(err);
             return [];
         }
+
+    }
+
+    get coverImageUrl() {
+        return this.id
+            ? `${API.CONTENT}/content/${this.id}/cover-image`
+            : "/placeholder-book.jpg";
     }
 }

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 export default function SearchableTags({ tags, selectedTags, setSelectedTags, maxVisible = 6 }) {
     const [search, setSearch] = useState("");
 
-    // Filtra i tag in base alla barra di ricerca
+
     const visibleTags = tags
         .filter(tag => tag.name.toLowerCase().includes(search.toLowerCase()))
         .slice(0, maxVisible);

@@ -19,7 +19,7 @@ export default function BookCard({ book }) {
         >
             <div className="relative w-full h-40 bg-purple-50 rounded-md flex items-center justify-center overflow-hidden">
                 <img
-                    src={book.image ?? book.coverImageUrl ?? "/placeholder-book.jpg"}
+                    src={book.coverImageUrl }
                     alt={book.title ?? "Untitled"}
                     className="object-cover w-full h-full"
                 />

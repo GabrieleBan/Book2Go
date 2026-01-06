@@ -7,8 +7,9 @@ export default function DashboardPage() {
 
     const actions = [
         { id: 1, name: "Inventario", path: "/inventory" },
-        { id: 2, name: "Prestiti", path: "/lends" },
+        { id: 2, name: "Prestiti", path: "/staff-lending-actions" },
         { id: 3, name: "Acquisti", path: "/purchases" },
+        { id: 4, name: "Catalogo", path: "/catalog" },
 
     ];
 

@@ -96,7 +96,7 @@ export default function LendPage() {
     }, [selectedReader]);
 
     return (
-        <div className="p-6 max-w-4xl mx-auto bg-white h-screen w-screen">
+        <div className="p-6 max-w-full bg-white h-screen w-screen">
             <h1 className="text-2xl font-bold mb-4">Gestione Prestiti</h1>
 
             {!selectedReader && <UserSearch onSelectReader={setSelectedReader} />}

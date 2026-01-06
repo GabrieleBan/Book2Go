@@ -5,6 +5,7 @@ export const API = {
     AUTH: import.meta.env.VITE_API_URL_AUTH,
     BOOK: import.meta.env.VITE_API_URL_BOOK,
     REVIEW: import.meta.env.VITE_API_URL_REVIEW,
+    CONTENT: import.meta.env.VITE_API_URL_CONTENT,
 };
 console.log("API:", API);
 console.log(import.meta.env)

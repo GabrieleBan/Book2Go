@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/pagination";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import BookSummary from "@/classes/BookSummary.js";
 import Tag from "@/classes/Tag.js";
 import SearchableTags from "@/components/searchable-tags.jsx";
@@ -30,7 +30,7 @@ import {Button} from "@/components/ui/button.js";
 
 
 
-export default function CatalogPage({ initialSelectedTags = [] }) {
+export default function CatalogPage({ initialSelectedTags = [], extraActionsSidebar = null }) {
     const [selectedTags, setSelectedTags] = useState([]);
     const [tagsArray, setTagsArray] = useState([]);
     const [books, setBooks] = useState([]);
@@ -186,8 +186,8 @@ export default function CatalogPage({ initialSelectedTags = [] }) {
                     <h3 className="font-semibold mt-4 mb-2">Prezzo</h3>
                     <Slider
                         min={0}
-                        max={1000}
-                        step={1}
+                        max={500}
+                        step={10}
                         defaultValue={priceRange}
                         onValueChange={setPriceRange}
                     />
@@ -263,6 +263,11 @@ export default function CatalogPage({ initialSelectedTags = [] }) {
                         </Pagination>
                     </div>
                 </section>
+                {extraActionsSidebar && (
+                    <aside className="w-56 p-4 bg-gray-50 border rounded flex flex-col gap-3">
+                        {extraActionsSidebar}
+                    </aside>
+                )}
             </main>
         </div>
     );

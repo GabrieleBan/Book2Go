@@ -272,9 +272,9 @@ export default function BookPage() {
                             className="relative rounded-md shadow overflow-hidden bg-purple-50 flex items-center justify-center w-full"
                             style={{ height: "500px" }}
                         >
-                            {bookToRender.image ? (
+                            {bookToRender.coverImageUrl ? (
                                 <img
-                                    src={bookToRender.image}
+                                    src={bookToRender.coverImageUrl}
                                     alt={bookToRender.title}
                                     className="max-w-full max-h-full object-contain"
                                 />
