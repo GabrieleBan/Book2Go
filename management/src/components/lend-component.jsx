@@ -4,7 +4,6 @@ import {Context} from "@/components/context-provider.jsx";
 import RentalFormat from "@/classes/LendableFormats.js";
 import Subscriptions from "@/classes/Subscriptions.js";
 import {API} from "@/utils/api.js";
-
 export default function LendComponent({ formatId, formatType, onClose }) {
     const [libraries, setLibraries] = useState([]);
     const [selectedLibrary, setSelectedLibrary] = useState(null);
@@ -12,11 +11,11 @@ export default function LendComponent({ formatId, formatType, onClose }) {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const { getTokens } = Context();
-    const { user }=Context();
+    const { user } = Context();
     const [options, setOptions] = useState([]);
     const [selectedOption, setSelectedOption] = useState(null);
 
-    // Mock fetch delle librerie
+    // Fetch librerie
     useEffect(() => {
         const fetchLibraries = async () => {
             const data = [
@@ -38,6 +37,7 @@ export default function LendComponent({ formatId, formatType, onClose }) {
         fetchLibraries();
     }, []);
 
+    // Funzione di conferma
     const handleConfirm = async () => {
         if (!selectedLibrary) return;
         const token = getTokens()?.accessToken;
@@ -67,7 +67,7 @@ export default function LendComponent({ formatId, formatType, onClose }) {
             if (!res.ok) {
                 let errorMessage = `Errore: ${res.status}`;
                 try {
-                    const data = await res.json(); // prova a parsare il JSON
+                    const data = await res.json();
                     if (data?.message) errorMessage = `Errore: ${data.message}`;
                 } catch (e) {
                     setError("Qualcosa non è andato come doveva. Riprova più tardi o contatta l'assistenza.")
@@ -84,6 +84,8 @@ export default function LendComponent({ formatId, formatType, onClose }) {
             setLoading(false);
         }
     };
+
+    // Fetch opzioni
     useEffect(() => {
         const fetchOptions = async () => {
             const token = getTokens()?.accessToken;
@@ -128,6 +130,7 @@ export default function LendComponent({ formatId, formatType, onClose }) {
                     <div className="font-medium">{formatType}</div>
                     <div className="font-mono text-sm text-gray-600 mt-1">{formatId}</div>
                 </div>
+
                 {selectedOption && (
                     <p className="text-gray-600 mb-2">
                         Durata prestito: {selectedOption.durationDays} giorni · Rinnovi max: {selectedOption.maxRenewals}
@@ -161,6 +164,20 @@ export default function LendComponent({ formatId, formatType, onClose }) {
                             ))}
                         </div>
                     </>
+                )}
+                {options.length === 0 && (
+                    <p className="text-red-500 mt-4">Il libro non ha opzioni di prestito disponibili.</p>
+                )}
+
+
+
+                {selectedOption && selectedLibrary && (
+                    <div className="mt-4 p-3 bg-gray-100 rounded-md">
+                        <h3 className="text-lg font-medium">Opzione di prestito selezionata:</h3>
+                        <p className="text-gray-600 mb-1">Durata prestito: {selectedOption.durationDays} giorni</p>
+                        <p className="text-gray-600 mb-1">Max rinnovi: {selectedOption.maxRenewals}</p>
+                        <p className="text-gray-600 mb-1">Tier minimo richiesto: {selectedOption.minRequiredTier}</p>
+                    </div>
                 )}
 
                 {error && <p className="text-red-500 mb-2">{error}</p>}

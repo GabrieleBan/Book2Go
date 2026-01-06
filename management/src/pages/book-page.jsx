@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import AppHeader from "@/components/AppHeader.jsx";
 import { Card } from "@/components/ui/card.js";
 import { Button } from "@/components/ui/button.js";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group.js";
+
 import { Textarea } from "@/components/ui/textarea.js";
 import { Context } from "@/components/context-provider.jsx";
 import BookCard from "@/components/book-card.jsx";
@@ -22,6 +22,8 @@ import BookSummary from "@/classes/BookSummary.js";
 import LendableFormat from "@/classes/LendableFormats.js";
 import LendComponent from "@/components/lend-component.jsx"
 import Subscriptions from "@/classes/Subscriptions.js";
+import AddFormatOverlay from "@/components/AddFormatOverlay.jsx";
+import {API} from "@/utils/api.js";
 
 export default function BookPage() {
     const [book, setBook] = useState(null);
@@ -66,6 +68,61 @@ export default function BookPage() {
         LendableFormat.fetchByBookId(lastBook?.id, token)
             .then(setLendableFormats);
     }, []);
+
+    const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
+    useEffect(() => {
+        async function loadBook() {
+            if (!lastBook?.id) return;
+
+            try {
+                const detailedBook = await BookDetails.fetchById(lastBook.id);
+                setBook(detailedBook);
+                console.log("loaded", detailedBook);
+            } catch (err) {
+                console.error("Errore fetch book details:", err);
+                setBook(testBook);  // fallback
+            }
+        }
+        loadBook();
+    }, [lastBook]);
+
+    useEffect(() => {
+        const token = getTokens()?.accessToken;
+        LendableFormat.fetchByBookId(lastBook?.id, token)
+            .then(setLendableFormats);
+    }, []);
+
+    const handleAddFormat = async (newFormat) => {
+        if (!book?.id) return;
+        const token = getTokens()?.accessToken;
+        try {
+            const res = await fetch(`${API.BOOK}/books/${book.id}/formats`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify(newFormat),  // Passa i dati del nuovo formato
+            });
+
+            const resData = await res.json();
+            if (!res.ok) throw new Error(resData.message || "Errore nell'aggiunta del formato");
+
+            alert("Formato aggiunto con successo!");
+            const updatedBook = await BookDetails.fetchById(book.id);
+            setBook(updatedBook);
+            setIsOverlayOpen(false); // Chiudi l'overlay
+        } catch (err) {
+            console.error(err);
+            alert(err.message);
+        }
+    };
+
 
     // Fallback book se fetch non è pronta
     const testBook = new BookDetails({
@@ -305,6 +362,24 @@ export default function BookPage() {
                                 })}
                             </div>
                         </div>
+                        {/* Add New Format Button */}
+                        {user?.roles?.includes("ADMIN") && (
+                            <div className="text-right mb-4">
+                                <button
+                                    className="bg-blue-500 text-white p-2 rounded"
+                                    onClick={() => setIsOverlayOpen(true)}
+                                >
+                                    Aggiungi Nuovo Formato
+                                </button>
+                            </div>
+                        )}
+
+                        {/* AddFormatOverlay */}
+                        <AddFormatOverlay
+                            isOpen={isOverlayOpen}
+                            onClose={() => setIsOverlayOpen(false)}
+                            onAddFormat={handleAddFormat}
+                        />
                         {/*Formati per presitito o noleggio */}
                         <div className="mt-6 w-full">
                             <h5 className="font-semibold mb-2">Formati disponibili per il prestito</h5>

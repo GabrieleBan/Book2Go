@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import BookSummary from "@/classes/BookSummary.js";
+import {API} from "@/utils/api.js";
 
 // helper for localStorage sync
 const usePersistentState = (key, defaultValue, parser = JSON.parse) => {
@@ -36,7 +37,7 @@ export const ContextProvider = ({ children }) => {
     const login = (userData) => setUser(userData);
     const logout = async () => {
         const refreshTkn=tokens.refreshToken
-        const response = await fetch("http://localhost:8090/auth/logout", {
+        const response = await fetch(`${API.AUTH}/auth//logout`, {
             method: "POST",
             body: JSON.stringify({
                 refreshToken: refreshTkn,
@@ -49,33 +50,32 @@ export const ContextProvider = ({ children }) => {
         setLastBook(null);
     };
 
-    const refreshAuthenticationToken= async ()=>{
-        if(!tokens?.refreshToken) return;
-        const refreshTkn=tokens.refreshToken;
-        const response= await fetch("http://localhost:8090/auth/refresh", {
-                method: "POST",
-                body: JSON.stringify({
-                    refreshToken: refreshTkn,
-                }),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
-        )
-        if(response.ok){
-            const tok=await response.json();
-            try {
-                saveTokens({accessToken: tok.accessToken, refreshToken: tok.refreshToken})
-            }
-            catch (e){
-                console.log(e)
-            }
-        }
-        else {
-            console.log("Must log again")
-        }
+    useEffect(() => {
+        if (user && tokens?.refreshToken) {
+            const intervalId = setInterval(() => {
+                refreshAuthenticationToken();
+            }, 120000); // Ogni 2 minuti
 
-    }
+            return () => clearInterval(intervalId);  // Pulizia dell'intervallo quando il componente si smonta
+        }
+    }, [user, tokens]);
+    const refreshAuthenticationToken = async () => {
+        if (!tokens?.refreshToken) return;
+
+        const response = await fetch(`${API.AUTH}/auth/refresh`, {
+            method: "POST",
+            body: JSON.stringify({ refreshToken: tokens.refreshToken }),
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (response.ok) {
+            const tok = await response.json();
+            setTokens({ accessToken: tok.accessToken, refreshToken: tok.refreshToken });
+        } else {
+            console.log("Token refresh failed. Logging out...");
+            logout();  // Fai il logout se il refresh non ha successo
+        }
+    };
 
     const updateUser = (updates) => setUser((prev) => ({ ...prev, ...updates }));
 
