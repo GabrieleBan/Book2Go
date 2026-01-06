@@ -32,7 +32,17 @@ export default class BookDetails {
     }
 
     getPrice(format = "Fisico") {
-        return this.prices?.[format] || null;
+        if (!this.prices || Object.keys(this.prices).length === 0) {
+            return null;
+        }
+
+        if (this.prices[format] != null) {
+            return this.prices[format];
+        }
+
+        // Ritorna il primo prezzo disponibile
+        const firstPrice = Object.values(this.prices).find(p => p != null);
+        return firstPrice ?? null;
     }
 
     getStars() {
@@ -60,11 +70,23 @@ export default class BookDetails {
 
     static fromJSON(json) {
         const prices = {};
+
+        if (json.prices) {
+            for (const [key, val] of Object.entries(json.prices)) {
+                prices[key] = val?.discountedPrice ?? val?.basePrice ?? null;
+            }
+        }
         if (json.availableFormats) {
-            const map = { PHYSICAL: "Fisico", EBOOK: "Digitale", AUDIOBOOK: "Audiolibro" };
+            const map = {
+                PHYSICAL: "Fisico",
+                EBOOK: "Digitale",
+                AUDIOBOOK: "Audiolibro",
+                PAPERBACK: "COPERTINA FLESSIBILE",
+                HARDBACK: "COPERTINA RIGIDA"
+            };
             json.availableFormats.forEach(f => {
                 const key = map[f.formatType];
-                if (key) prices[key] = f.purchasePrice ?? null;
+                if (key) prices[key] = f.discountedPrice ?? f.purchasePrice ?? f.basePrice ?? null;
             });
         }
 
@@ -87,6 +109,7 @@ export default class BookDetails {
             availableFormats: json.availableFormats ?? []
         });
     }
+
 
     // --- NUOVA FUNZIONE STATICA ---
     static async fetchById(id) {

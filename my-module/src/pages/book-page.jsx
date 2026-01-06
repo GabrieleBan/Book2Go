@@ -50,6 +50,7 @@ export default function BookPage() {
             try {
                 const detailedBook = await BookDetails.fetchById(lastBook.id);
                 setBook(detailedBook);
+                console.log("loaded",detailedBook)
 
             } catch (err) {
                 console.error("Errore fetch book details:", err);
@@ -288,17 +289,14 @@ export default function BookPage() {
                             <h5 className="font-semibold mb-2">Formati acquistabili</h5>
                             <div className="flex flex-col gap-2">
                                 {Object.entries(bookToRender.prices).map(([format, price]) => {
-                                    if (price === null) return null;
+                                    if (price == null) return null;
                                     return (
                                         <button
                                             key={format}
                                             className="flex items-center justify-between w-full border p-2 rounded-md
                                bg-white text-gray-800 border-gray-300
                                hover:bg-black hover:text-white hover:border-black transition-colors duration-200"
-                                            onClick={() => {
-                                                // Mocked purchase action
-                                                console.log(`Acquisto formato ${format} a ${price.toFixed(2)} €`);
-                                            }}
+                                            onClick={() => console.log(`Acquisto formato ${format} a ${price.toFixed(2)} €`)}
                                         >
                                             <span>{format}</span>
                                             <span>{price.toFixed(2)} €</span>

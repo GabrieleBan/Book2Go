@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import {Context, ContextProvider} from "@/components/context-provider.jsx";
-import CatalogPage from "@/pages/catalog-page.jsx";
 import StaffLoggingPage from "@/pages/StaffLoggingPage.jsx";
 import DashboardPage from "@/pages/dashboard-page.jsx";
 import LendPage from "@/pages/lend-management-page.jsx";

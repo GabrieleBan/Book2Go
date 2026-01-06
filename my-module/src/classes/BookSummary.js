@@ -32,18 +32,29 @@ export default class BookSummary {
         return this.rating ? "★".repeat(Math.floor(this.rating)) : "";
     }
 
-    /**
-     * Restituisce il prezzo per formato
-     * @param {string} format - "PHYSICAL", "EBOOK", "AUDIOBOOK"
-     * @returns {number|null}
-     */
+
     getPrice(format = "PHYSICAL") {
+        if (!this.prices || Object.keys(this.prices).length === 0) return null;
+
         if (format === "Fisico") {
-            // Ritorna il prezzo più alto tra tutti i formati
-            const values = Object.values(this.prices);
-            return values.length > 0 ? Math.max(...values) : null;
+
+            const allPrices = Object.values(this.prices)
+                .map(p => p?.discountedPrice ?? p?.basePrice ?? null)
+                .filter(p => p != null);
+            return allPrices.length > 0 ? Math.max(...allPrices) : null;
         }
-        return this.prices?.[format] ?? null;
+
+
+        const priceObj = this.prices[format];
+        if (!priceObj) {
+
+            const firstPrice = Object.values(this.prices)
+                .map(p => p?.discountedPrice ?? p?.basePrice ?? null)
+                .find(p => p != null);
+            return firstPrice ?? null;
+        }
+
+        return priceObj.discountedPrice ?? priceObj.basePrice ?? null;
     }
 
 
@@ -82,25 +93,41 @@ export default class BookSummary {
         });
     }
 
-    /**
-     * Fetch books optionally filtered by name and category IDs
-     * @param {string} [name] - Optional substring to filter book titles
-     * @param {string[]} [categoryIds] - Optional array of category UUIDs
-     * @returns {Promise<BookSummary[]>}
-     */
-    static async fetchAll(name = "", categoryIds = []) {
+    static async fetchAll(filters = {}) {
         try {
             const apiEndpoint = `${API.BOOK}/books/`;
-            console.log(apiEndpoint)
             const params = new URLSearchParams();
+            console.log("params",filters)
+            const {
+                title,
+                author,
+                publisher,
+                categoryIds = [],
+                formatType,
+                minPrice,
+                maxPrice,
+                minRating,
+                page = 0,
+                size = 20,
+                sort = "title,asc"
+            } = filters;
+
+            if (title?.trim()) params.append("title", title.trim());
+            if (author?.trim()) params.append("author", author.trim());
+            if (publisher?.trim()) params.append("publisher", publisher.trim());
 
             if (categoryIds.length > 0) {
                 params.append("categoryIds", categoryIds.join(","));
             }
 
-            if (name.trim()) {
-                params.append("name", name.trim());
-            }
+            if (formatType) params.append("formatType", formatType);
+            if (minPrice != null) params.append("minPrice", minPrice);
+            if (maxPrice != null) params.append("maxPrice", maxPrice);
+            if (minRating != null) params.append("minRating", minRating);
+
+            params.append("page", page);
+            params.append("size", size);
+            params.append("sort", sort);
 
             const url = `${apiEndpoint}?${params.toString()}`;
             const res = await fetch(url, { method: "GET" });
@@ -108,7 +135,9 @@ export default class BookSummary {
             if (!res.ok) throw new Error("Errore nel fetch dei libri");
 
             const data = await res.json();
-            return data.map(b => BookSummary.fromJSON(b));
+            console.log("📚 retrieved response:", data);
+
+            return data.content.map(b => BookSummary.fromJSON(b));
         } catch (err) {
             console.error(err);
             return [];

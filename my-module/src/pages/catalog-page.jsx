@@ -26,20 +26,36 @@ import Tag from "@/classes/Tag.js";
 import SearchableTags from "@/components/searchable-tags.jsx";
 import {Card} from "@/components/ui/card.js";
 import { useSearchParams} from "react-router-dom";
+import {Button} from "@/components/ui/button.js";
+
+
 
 export default function CatalogPage({ initialSelectedTags = [] }) {
     const [selectedTags, setSelectedTags] = useState([]);
     const [tagsArray, setTagsArray] = useState([]);
     const [books, setBooks] = useState([]);
+
     const [searchParams] = useSearchParams();
     const searchBarInput = searchParams.get("name") || "";
 
-    console.log("search bar", searchBarInput);
-    const [name, setName]= useState(searchBarInput)
+    const [name, setName] = useState(searchBarInput);
+    const [search, setSearch] = useState(searchBarInput);
+
+    const [selectedFormat, setSelectedFormat] = useState([]);
+    const [priceRange, setPriceRange] = useState([0, 1000]);
+    const [sortBy, setSortBy] = useState("title");
+    const [showMode, setShowMode] = useState("both");
+
+    const [page, setPage] = useState(0);
+    const [columns, setColumns] = useState(5);
+
+    // sync query param
     useEffect(() => {
         setName(searchBarInput);
+        setSearch(searchBarInput);
     }, [searchBarInput]);
-    // Carica i tag all'avvio
+
+    // carica tag
     useEffect(() => {
         async function loadTags() {
             const tags = await Tag.fetchAll();
@@ -47,7 +63,6 @@ export default function CatalogPage({ initialSelectedTags = [] }) {
 
             if (initialSelectedTags.length === 0) return;
 
-            // Normalizza tutto in oggetti {id, name}
             const normalized = initialSelectedTags
                 .map(sel => {
                     if (typeof sel === "object" && sel.id && sel.name) return sel;
@@ -61,29 +76,11 @@ export default function CatalogPage({ initialSelectedTags = [] }) {
 
         loadTags();
     }, []);
-
-    // Carica i libri all'avvio o quando cambiano i tag selezionati
     useEffect(() => {
-        async function loadBooks() {
-            const categoryIds = selectedTags.map(t => t.id);
-            console.log("Caricamento libri con categoryIds:", categoryIds); // <-- debug
-            const fetchedBooks = await BookSummary.fetchAll(name, categoryIds);
-            console.log("Libri fetchati:", fetchedBooks); // <-- debug
-            setBooks(fetchedBooks);
-        }
-        loadBooks();
-    }, [name,selectedTags]);
+        handleSearch(0);
+    },[]);
 
-    // Filters
-    const [search, setSearch] = useState("");
-    const [selectedFormat, setSelectedFormat] = useState([]);
-    const [priceRange, setPriceRange] = useState([0, 100]);
-    const [sortBy, setSortBy] = useState("recent");
-    const [showMode, setShowMode] = useState("both"); // purchase | lending | both
-    const [page, setPage] = useState(1);
-    const [columns, setColumns] = useState(5);
-
-    // Track responsive column count to enforce 4 rows max
+    // responsive columns
     useEffect(() => {
         function updateColumns() {
             if (window.innerWidth < 640) setColumns(2);
@@ -98,76 +95,53 @@ export default function CatalogPage({ initialSelectedTags = [] }) {
 
     const showCount = columns * 4;
 
-    // Filtered + sorted books
-    const filteredBooks = useMemo(() => {
-        let result = books.filter((b) => {
-            const matchesSearch = b.title.toLowerCase().includes(search.toLowerCase());
 
-            const matchesTags =
-                selectedTags.length === 0 ||
-                selectedTags.some((tag) => b.tags.includes(tag.name));
+    const handleSearch = async (newPage = 0) => {
+        const categoryIds = selectedTags.map(t => t.id);
 
-            const matchesFormat =
-                selectedFormat.length === 0 ||
-                selectedFormat.some((format) => b.prices[format] != null);
-
-            const bookMinPrice = Math.min(...Object.values(b.prices).filter((p) => p !== null));
-            const bookMaxPrice = Math.max(...Object.values(b.prices).filter((p) => p !== null));
-            const matchesPrice = bookMinPrice <= priceRange[1] && bookMaxPrice >= priceRange[0];
-
-            return matchesSearch && matchesTags && matchesFormat && matchesPrice;
+        const fetchedBooks = await BookSummary.fetchAll({
+            title: search || name,
+            categoryIds,
+            minPrice: priceRange[0],
+            maxPrice: priceRange[1],
+            sort:
+                sortBy === "price-asc"
+                    ? "price,asc"
+                    : sortBy === "price-desc"
+                        ? "price,desc"
+                        : "title,asc",
+            page: newPage,
+            size: showCount
         });
 
-        if (sortBy === "price-asc") {
-            result = [...result].sort((a, b) => {
-                const aMin = Math.min(...Object.values(a.prices).filter((p) => p !== null));
-                const bMin = Math.min(...Object.values(b.prices).filter((p) => p !== null));
-                return aMin - bMin;
-            });
-        } else if (sortBy === "price-desc") {
-            result = [...result].sort((a, b) => {
-                const aMax = Math.max(...Object.values(a.prices).filter((p) => p !== null));
-                const bMax = Math.max(...Object.values(b.prices).filter((p) => p !== null));
-                return bMax - aMax;
-            });
-        } else if (sortBy === "title") {
-            result = [...result].sort((a, b) => a.title.localeCompare(b.title));
-        }
-
-        return result;
-    }, [books, search, selectedTags, selectedFormat, priceRange, sortBy]);
-
-    const totalPages = Math.ceil(filteredBooks.length / showCount);
-    const paginatedBooks = filteredBooks.slice((page - 1) * showCount, page * showCount);
-    const toggleTag = (tag) => {
-        setSelectedTags((prev) =>
-            prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-        );
+        setPage(newPage);
+        setBooks(fetchedBooks);
     };
+
     return (
         <div className="w-screen bg-white flex flex-col">
             <AppHeader />
-            <div className="flex flex-wrap gap-2 mb-6">
-                {/* Nome della ricerca */}
+
+            {/* TAG SELEZIONATI */}
+            <div className="flex flex-wrap gap-2 mb-6 px-4 md:px-8">
                 {name && (
                     <Card
-                        key="search-name"
-                        className="px-3 py-1 cursor-pointer bg-[#F5E7D2] text-black font-semibold"
+                        className="px-3 py-1 cursor-pointer bg-[#F5E7D2] font-semibold"
                         onClick={() => {
-                            setName("")
+                            setName("");
+                            setSearch("");
                         }}
                     >
                         "{name}"
                     </Card>
                 )}
 
-                {/* Tags selezionati */}
-                {selectedTags.map((tag) => (
+                {selectedTags.map(tag => (
                     <Card
-                        key={tag.id} // id unico
-                        className="px-3 py-1 cursor-pointer bg-[#F5E7D2] text-black"
+                        key={tag.id}
+                        className="px-3 py-1 cursor-pointer bg-[#F5E7D2]"
                         onClick={() =>
-                            setSelectedTags((prev) => prev.filter((t) => t.id !== tag.id)) // Rimuove il tag cliccato
+                            setSelectedTags(prev => prev.filter(t => t.id !== tag.id))
                         }
                     >
                         {tag.name}
@@ -176,7 +150,8 @@ export default function CatalogPage({ initialSelectedTags = [] }) {
             </div>
 
             <main className="flex flex-1 px-4 md:px-8 py-6 gap-6">
-                <aside className="max-w-64 ">
+                {/* SIDEBAR */}
+                <aside className="max-w-64">
                     <h3 className="font-semibold mb-2">Tags</h3>
                     <SearchableTags
                         tags={tagsArray}
@@ -186,18 +161,25 @@ export default function CatalogPage({ initialSelectedTags = [] }) {
                     />
 
                     <h3 className="font-semibold mt-4 mb-2">Formato</h3>
-                    {["Fisico", "Digitale", "Audiolibro"].map((format) => (
+                    {["Fisico", "Digitale", "Audiolibro"].map(format => (
                         <div key={format} className="flex items-center space-x-2">
                             <Checkbox
-                                id={format}
                                 checked={selectedFormat.includes(format)}
-                                onCheckedChange={(checked) => {
-                                    setSelectedFormat((prev) =>
-                                        checked ? [...prev, format] : prev.filter((f) => f !== format)
-                                    );
-                                }}
+                                onCheckedChange={(checked) =>
+                                    setSelectedFormat(prev =>
+                                        checked
+                                            ? [...prev, format]
+                                            : prev.filter(f => f !== format)
+                                    )
+                                }
+                                className="
+                                border-gray-400
+                                data-[state=checked]:bg-black
+                                data-[state=checked]:text-white
+                                data-[state=checked]:border-black
+            "
                             />
-                            <label htmlFor={format}>{format}</label>
+                            <label className="text-black">{format}</label>
                         </div>
                     ))}
 
@@ -207,29 +189,32 @@ export default function CatalogPage({ initialSelectedTags = [] }) {
                         max={1000}
                         step={1}
                         defaultValue={priceRange}
-                        onValueChange={(val) => setPriceRange(val)}
+                        onValueChange={setPriceRange}
                     />
                     <p className="text-sm text-gray-600">
                         {priceRange[0]} € - {priceRange[1]} €
                     </p>
                 </aside>
 
+                {/* CONTENT */}
                 <section className="flex-1 flex flex-col">
                     <div className="flex flex-col md:flex-row gap-4 mb-6 items-center justify-between">
-                        <Input
-                            placeholder="Cerca..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="max-w-sm"
-                        />
+                        <div className="flex gap-2">
+                            <Input
+                                placeholder="Cerca..."
+                                value={search}
+                                onChange={e => setSearch(e.target.value)}
+                                className="max-w-sm"
+                            />
+                            <Button onClick={() => handleSearch(0)}>Cerca</Button>
+                        </div>
 
                         <div className="flex gap-4">
-                            <Select defaultValue="recent" onValueChange={setSortBy}>
+                            <Select defaultValue="title" onValueChange={setSortBy}>
                                 <SelectTrigger className="w-40">
                                     <SelectValue placeholder="Sort By" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="recent">Recently added</SelectItem>
                                     <SelectItem value="title">Title</SelectItem>
                                     <SelectItem value="price-asc">Price: Low to High</SelectItem>
                                     <SelectItem value="price-desc">Price: High to Low</SelectItem>
@@ -250,29 +235,29 @@ export default function CatalogPage({ initialSelectedTags = [] }) {
                     </div>
 
                     <div className="flex flex-wrap gap-8">
-                        {paginatedBooks.map((book) => (
+                        {books.map(book => (
                             <div key={book.id} className="w-[180px]">
                                 <BookCard book={book} />
                             </div>
                         ))}
                     </div>
 
+                    {/* PAGINAZIONE BACKEND */}
                     <div className="mt-6 flex justify-center">
                         <Pagination>
                             <PaginationContent>
                                 <PaginationItem>
-                                    <PaginationPrevious href="#" onClick={() => setPage((p) => Math.max(1, p - 1))} />
+                                    <PaginationPrevious
+                                        href="#"
+                                        onClick={() => handleSearch(Math.max(0, page - 1))}
+                                    />
                                 </PaginationItem>
-                                {Array.from({ length: totalPages }, (_, i) => (
-                                    <PaginationItem key={i}>
-                                        <PaginationLink href="#" isActive={page === i + 1} onClick={() => setPage(i + 1)}>
-                                            {i + 1}
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                ))}
-                                {totalPages > 5 && <PaginationEllipsis />}
+
                                 <PaginationItem>
-                                    <PaginationNext href="#" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} />
+                                    <PaginationNext
+                                        href="#"
+                                        onClick={() => handleSearch(page + 1)}
+                                    />
                                 </PaginationItem>
                             </PaginationContent>
                         </Pagination>
