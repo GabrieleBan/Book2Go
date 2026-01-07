@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite --mode dev",
     "build": "vite build --mode dev",
-    "prod": "vite --mode prod",
+    "prod": "vite --mode prod --host book2go",
     "build:docker": "vite build --mode docker",
     "build:k8s": "vite build --mode kubernetes",
     "lint": "eslint .",
