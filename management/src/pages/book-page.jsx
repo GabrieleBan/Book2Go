@@ -24,6 +24,9 @@ import LendComponent from "@/components/lend-component.jsx"
 import Subscriptions from "@/classes/Subscriptions.js";
 import AddFormatOverlay from "@/components/AddFormatOverlay.jsx";
 import {API} from "@/utils/api.js";
+import { useNavigate } from "react-router-dom";
+
+
 
 export default function BookPage() {
     const [book, setBook] = useState(null);
@@ -35,6 +38,7 @@ export default function BookPage() {
         formatId: null,
         formatType: null,
     });
+    const navigate = useNavigate();
 
     const { user }=Context();
 
@@ -222,7 +226,20 @@ export default function BookPage() {
             tags: ["Storia", "Famiglia", "Drammatico"]
         }),
     ];
-
+    function getAvailabilityLabel(availability) {
+        switch (availability) {
+            case "AVAILABLE":
+                return "Disponibile";
+            case "LOW_STOCK":
+                return "Pochi pezzi";
+            case "OUT_OF_STOCK":
+                return "Esaurito";
+            case "NOT_AVAILABLE":
+                return "Non disponibile";
+            default:
+                return "Non disponibile";
+        }
+    }
 
     const pageSize = 5;
     const [reviews, setReviews] = useState([]);
@@ -231,6 +248,23 @@ export default function BookPage() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [reviewTitle, setReviewTitle] = useState("");
     const [reviewText, setReviewText] = useState("");
+    const [formats, setFormats] = useState([]);
+    const [loadingFormats, setLoadingFormats] = useState(true);
+    useEffect(() => {
+        if (!bookToRender?.id) return;
+
+        fetch(`${API.BOOK}/books/${bookToRender.id}/formats`)
+            .then(res => res.json())
+            .then(data => {
+                setFormats(
+                    data
+                );
+            })
+            .catch(err => {
+                console.error("Errore caricamento formati", err);
+            })
+            .finally(() => setLoadingFormats(false));
+    }, [bookToRender?.id]);
     useEffect(() => {
         if (!lastBook?.id) return;
 
@@ -275,7 +309,8 @@ export default function BookPage() {
             day: "numeric"
         });
     }
-
+    const calculateFinalPrice = (price) =>
+        price.purchasePrice * (1 - price.discountPercent / 100);
     async function sendReview() {
 
         const token = getTokens()?.accessToken;
@@ -344,23 +379,84 @@ export default function BookPage() {
 
                         <div className="mt-6 w-full">
                             <h5 className="font-semibold mb-2">Formati acquistabili</h5>
-                            <div className="flex flex-col gap-2">
-                                {Object.entries(bookToRender.prices).map(([format, price]) => {
-                                    if (price == null) return null;
-                                    return (
+
+                            {loadingFormats && <p>Caricamento formati...</p>}
+
+                            {!loadingFormats && formats.length === 0 && (
+                                <p className="text-gray-500">Nessun formato disponibile</p>
+                            )}
+                            {formats.map((format) => {
+                                const canBuy =
+                                    format.sellable &&
+                                    (format.availability === "AVAILABLE" ||
+                                        format.availability === "LOW_STOCK");
+
+                                const hasDiscount = format.price.discountPercent > 0;
+                                const finalPrice = calculateFinalPrice(format.price);
+
+                                return (
+                                    <div key={format.id} className="flex items-stretch gap-2 w-full">
+
+                                        {/* Bottone acquisto */}
                                         <button
-                                            key={format}
-                                            className="flex items-center justify-between w-full border p-2 rounded-md
-                               bg-white text-gray-800 border-gray-300
-                               hover:bg-black hover:text-white hover:border-black transition-colors duration-200"
-                                            onClick={() => console.log(`Acquisto formato ${format} a ${price.toFixed(2)} €`)}
+                                            disabled={!canBuy}
+                                            onClick={() => {
+                                                if (!canBuy) return;
+                                                console.log("Acquisto formato:", format.id);
+                                            }}
+                                            className={`flex flex-col gap-1 flex-1 border p-3 rounded-md text-left transition
+      ${
+                                                canBuy
+                                                    ? "bg-white text-gray-800 border-gray-300 hover:bg-black hover:text-white"
+                                                    : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                                            }`}
                                         >
-                                            <span>{format}</span>
-                                            <span>{price.toFixed(2)} €</span>
+                                            {/* Header */}
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-medium">{format.formatType}</span>
+
+                                                {hasDiscount && (
+                                                    <span className="text-xs font-semibold px-2 py-1 rounded bg-red-600 text-white">
+          -{format.price.discountPercent}%
+        </span>
+                                                )}
+                                            </div>
+
+                                            {/* Prezzi */}
+                                            <div className="flex items-center gap-2">
+                                                {hasDiscount && (
+                                                    <span className="line-through text-sm">
+          {format.price.purchasePrice.toFixed(2)} €
+        </span>
+                                                )}
+                                                <span className="font-semibold">
+        {finalPrice.toFixed(2)} €
+      </span>
+                                            </div>
+
+                                            {/* Stato */}
+                                            <span className="text-xs">
+      {!format.sellable
+          ? "Non vendibile"
+          : getAvailabilityLabel(format.availability)}
+    </span>
                                         </button>
-                                    );
-                                })}
-                            </div>
+
+                                        {/* Bottone gestione inventario */}
+                                        {user?.roles?.some(r => r === "ADMIN" || r === "EMPLOYEE") && (
+                                            <button
+                                                onClick={() => navigate(`/inventory/manage/${format.id}`)}
+                                                title="Gestisci inventario"
+                                                className="px-3 text-sm border rounded-md bg-white hover:bg-gray-100 flex items-center justify-center"
+                                            >
+                                                ⚙️
+                                            </button>
+                                        )}
+                                    </div>
+
+                                );
+                            })}
+
                         </div>
                         {/* Add New Format Button */}
                         {user?.roles?.includes("ADMIN") && (

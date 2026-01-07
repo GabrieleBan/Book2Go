@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import AppHeader from "@/components/AppHeader.jsx";
 import { Card } from "@/components/ui/card.js";
 import { Button } from "@/components/ui/button.js";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group.js";
+
 import { Textarea } from "@/components/ui/textarea.js";
 import { Context } from "@/components/context-provider.jsx";
 import BookCard from "@/components/book-card.jsx";
@@ -22,6 +22,7 @@ import BookSummary from "@/classes/BookSummary.js";
 import LendableFormat from "@/classes/LendableFormats.js";
 import LendComponent from "@/components/lend-component.jsx"
 import Subscriptions from "@/classes/Subscriptions.js";
+import {API} from "@/utils/api.js";
 
 export default function BookPage() {
     const [book, setBook] = useState(null);
@@ -66,6 +67,61 @@ export default function BookPage() {
         LendableFormat.fetchByBookId(lastBook?.id, token)
             .then(setLendableFormats);
     }, []);
+
+    const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
+    useEffect(() => {
+        async function loadBook() {
+            if (!lastBook?.id) return;
+
+            try {
+                const detailedBook = await BookDetails.fetchById(lastBook.id);
+                setBook(detailedBook);
+                console.log("loaded", detailedBook);
+            } catch (err) {
+                console.error("Errore fetch book details:", err);
+                setBook(testBook);  // fallback
+            }
+        }
+        loadBook();
+    }, [lastBook]);
+
+    useEffect(() => {
+        const token = getTokens()?.accessToken;
+        LendableFormat.fetchByBookId(lastBook?.id, token)
+            .then(setLendableFormats);
+    }, []);
+
+    const handleAddFormat = async (newFormat) => {
+        if (!book?.id) return;
+        const token = getTokens()?.accessToken;
+        try {
+            const res = await fetch(`${API.BOOK}/books/${book.id}/formats`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify(newFormat),  // Passa i dati del nuovo formato
+            });
+
+            const resData = await res.json();
+            if (!res.ok) throw new Error(resData.message || "Errore nell'aggiunta del formato");
+
+            alert("Formato aggiunto con successo!");
+            const updatedBook = await BookDetails.fetchById(book.id);
+            setBook(updatedBook);
+            setIsOverlayOpen(false); // Chiudi l'overlay
+        } catch (err) {
+            console.error(err);
+            alert(err.message);
+        }
+    };
+
 
     // Fallback book se fetch non è pronta
     const testBook = new BookDetails({
@@ -165,7 +221,20 @@ export default function BookPage() {
             tags: ["Storia", "Famiglia", "Drammatico"]
         }),
     ];
-
+    function getAvailabilityLabel(availability) {
+        switch (availability) {
+            case "AVAILABLE":
+                return "Disponibile";
+            case "LOW_STOCK":
+                return "Pochi pezzi";
+            case "OUT_OF_STOCK":
+                return "Esaurito";
+            case "NOT_AVAILABLE":
+                return "Non disponibile";
+            default:
+                return "Non disponibile";
+        }
+    }
 
     const pageSize = 5;
     const [reviews, setReviews] = useState([]);
@@ -174,6 +243,23 @@ export default function BookPage() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [reviewTitle, setReviewTitle] = useState("");
     const [reviewText, setReviewText] = useState("");
+    const [formats, setFormats] = useState([]);
+    const [loadingFormats, setLoadingFormats] = useState(true);
+    useEffect(() => {
+        if (!bookToRender?.id) return;
+
+        fetch(`${API.BOOK}/books/${bookToRender.id}/formats`)
+            .then(res => res.json())
+            .then(data => {
+                setFormats(
+                    data
+                );
+            })
+            .catch(err => {
+                console.error("Errore caricamento formati", err);
+            })
+            .finally(() => setLoadingFormats(false));
+    }, [bookToRender?.id]);
     useEffect(() => {
         if (!lastBook?.id) return;
 
@@ -218,7 +304,8 @@ export default function BookPage() {
             day: "numeric"
         });
     }
-
+    const calculateFinalPrice = (price) =>
+        price.purchasePrice * (1 - price.discountPercent / 100);
     async function sendReview() {
 
         const token = getTokens()?.accessToken;
@@ -272,9 +359,7 @@ export default function BookPage() {
                             className="relative rounded-md shadow overflow-hidden bg-purple-50 flex items-center justify-center w-full"
                             style={{ height: "500px" }}
                         >
-                            {
-                                bookToRender.coverImageUrl ? (
-
+                            {bookToRender.coverImageUrl ? (
                                 <img
                                     src={bookToRender.coverImageUrl}
                                     alt={bookToRender.title}
@@ -289,24 +374,72 @@ export default function BookPage() {
 
                         <div className="mt-6 w-full">
                             <h5 className="font-semibold mb-2">Formati acquistabili</h5>
-                            <div className="flex flex-col gap-2">
-                                {Object.entries(bookToRender.prices).map(([format, price]) => {
-                                    if (price == null) return null;
-                                    return (
-                                        <button
-                                            key={format}
-                                            className="flex items-center justify-between w-full border p-2 rounded-md
-                               bg-white text-gray-800 border-gray-300
-                               hover:bg-black hover:text-white hover:border-black transition-colors duration-200"
-                                            onClick={() => console.log(`Acquisto formato ${format} a ${price.toFixed(2)} €`)}
-                                        >
-                                            <span>{format}</span>
-                                            <span>{price.toFixed(2)} €</span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
+
+                            {loadingFormats && <p>Caricamento formati...</p>}
+
+                            {!loadingFormats && formats.length === 0 && (
+                                <p className="text-gray-500">Nessun formato disponibile</p>
+                            )}
+                            {formats.map((format) => {
+                                const canBuy =
+                                    format.sellable &&
+                                    (format.availability === "AVAILABLE" ||
+                                        format.availability === "LOW_STOCK");
+
+                                const hasDiscount = format.price.discountPercent > 0;
+                                const finalPrice = calculateFinalPrice(format.price);
+
+                                return (
+                                    <button
+                                        key={format.id}
+                                        disabled={!canBuy}
+                                        onClick={() => {
+                                            if (!canBuy) return;
+                                            console.log("Acquisto formato:", format.id);
+                                        }}
+                                        className={`flex flex-col gap-1 w-full border p-3 rounded-md text-left transition
+        ${
+                                            canBuy
+                                                ? "bg-white text-gray-800 border-gray-300 hover:bg-black hover:text-white"
+                                                : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                                        }`}
+                                    >
+                                        {/* Header */}
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-medium">{format.formatType}</span>
+
+                                            {hasDiscount && (
+                                                <span className="text-xs font-semibold px-2 py-1 rounded bg-red-600 text-white">
+            -{format.price.discountPercent}%
+          </span>
+                                            )}
+                                        </div>
+
+                                        {/* Prezzi */}
+                                        <div className="flex items-center gap-2">
+                                            {hasDiscount && (
+                                                <span className="line-through text-sm">
+            {format.price.purchasePrice.toFixed(2)} €
+          </span>
+                                            )}
+                                            <span className="font-semibold">
+          {finalPrice.toFixed(2)} €
+        </span>
+                                        </div>
+
+                                        {/* Stato */}
+                                        <span className="text-xs">
+        {!format.sellable
+            ? "Non vendibile"
+            : getAvailabilityLabel(format.availability)}
+      </span>
+                                    </button>
+
+                                );
+                            })}
+
                         </div>
+
                         {/*Formati per presitito o noleggio */}
                         <div className="mt-6 w-full">
                             <h5 className="font-semibold mb-2">Formati disponibili per il prestito</h5>

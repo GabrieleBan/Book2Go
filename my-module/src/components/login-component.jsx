@@ -102,7 +102,8 @@ export function LoginComponent({ setShowLogin }) {
     function handleRegistration(username, pwd, email) {
         if(username.trim()==="" || pwd.trim()===""||email.trim()==="")
             return
-        fetch("http://localhost:8090/auth/register", {
+
+        fetch(`${API.AUTH}/auth/register`, {
             method: "POST",
             body: JSON.stringify({
                 username: username,

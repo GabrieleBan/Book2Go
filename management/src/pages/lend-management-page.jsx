@@ -80,10 +80,10 @@ export default function LendPage() {
                 return;
             }
 
-            // Conferma consegna
+
             setDeliverMessages((prev) => ({ ...prev, [lending.id]: "Consegna avvenuta con successo!" }));
 
-            // Aggiorna lista prestiti dopo consegna
+
             fetchLendings(selectedReader.id);
         } catch (err) {
             console.error(err);

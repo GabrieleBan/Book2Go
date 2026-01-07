@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import BookSummary from "@/classes/BookSummary.js";
 import {API} from "@/utils/api.js";
 
-// helper for localStorage sync
+
 const usePersistentState = (key, defaultValue, parser = JSON.parse) => {
     const [state, setState] = useState(() => {
         try {
@@ -38,7 +38,7 @@ export const ContextProvider = ({ children }) => {
     const login = (userData) => setUser(userData);
     const logout = async () => {
         const refreshTkn=tokens.refreshToken
-        const response = await fetch(`${API.AUTH}/auth//logout`, {
+        const response = await fetch(`${API.AUTH}/auth/logout`, {
             method: "POST",
             body: JSON.stringify({
                 refreshToken: refreshTkn,
@@ -81,7 +81,7 @@ export const ContextProvider = ({ children }) => {
 
     const rememberBook = (book) => {
         const b = book instanceof BookSummary ? book : new BookSummary(book);
-        setLastBook(b); // saved in localStorage automatically
+        setLastBook(b);
     };
 
     const saveTokens = ({ accessToken, refreshToken }) => setTokens({ accessToken, refreshToken });

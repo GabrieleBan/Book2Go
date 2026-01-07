@@ -9,6 +9,7 @@ import StaffLendingActionsPage from "@/pages/StaffLendingActionPage.jsx";
 import LendableBooksPage from "@/pages/LendableBooksPage.jsx";
 import StaffCatalogPage from "@/pages/StaffCatalogPage.jsx";
 import BookPage from "@/pages/book-page.jsx";
+import InventoryManagePage from "@/pages/InventoryManagePage.jsx";
 
 function ProtectedRoute({ children }) {
     const { user } = Context();
@@ -30,6 +31,22 @@ export default function App() {
                         element={
                             <ProtectedRoute>
                                 <DashboardPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/inventory/manage/:formatId"
+                        element={
+                            <ProtectedRoute>
+                                <InventoryManagePage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/inventory/manage/"
+                        element={
+                            <ProtectedRoute>
+                                <InventoryManagePage />
                             </ProtectedRoute>
                         }
                     />

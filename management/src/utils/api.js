@@ -6,6 +6,8 @@ export const API = {
     BOOK: import.meta.env.VITE_API_URL_BOOK,
     REVIEW: import.meta.env.VITE_API_URL_REVIEW,
     CONTENT: import.meta.env.VITE_API_URL_CONTENT,
+    INVENTORY:import.meta.env.VITE_API_URL_INVENTORY,
+
 };
 console.log("API:", API);
 console.log(import.meta.env)

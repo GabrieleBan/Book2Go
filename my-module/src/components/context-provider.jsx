@@ -31,13 +31,13 @@ export const ContextProvider = ({ children }) => {
     const [lastBook, setLastBook] = usePersistentState(
         "lastBook",
         null,
-        (saved) => BookSummary.fromJSON(JSON.parse(saved)) // restore Book instance
+        (saved) => BookSummary.fromJSON(JSON.parse(saved))
     );
 
     const login = (userData) => setUser(userData);
     const logout = async () => {
         const refreshTkn=tokens.refreshToken
-        const response = await fetch(`${API.AUTH}/auth//logout`, {
+        const response = await fetch(`${API.AUTH}/auth/logout`, {
             method: "POST",
             body: JSON.stringify({
                 refreshToken: refreshTkn,
@@ -56,7 +56,7 @@ export const ContextProvider = ({ children }) => {
                 refreshAuthenticationToken();
             }, 120000); // Ogni 2 minuti
 
-            return () => clearInterval(intervalId);  // Pulizia dell'intervallo quando il componente si smonta
+            return () => clearInterval(intervalId);
         }
     }, [user, tokens]);
     const refreshAuthenticationToken = async () => {

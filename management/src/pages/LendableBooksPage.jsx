@@ -107,7 +107,7 @@ export default function LendableBooksPage() {
             setResponseMessage("Opzioni di prestito aggiunte con successo!");
 
             // Dopo aver aggiunto le opzioni, ricarica le opzioni disponibili
-            checkIfLendable(); // Ricarica le opzioni
+            checkIfLendable();
         } catch (error) {
             console.error("Errore durante la richiesta", error);
             setResponseMessage("Errore durante la richiesta: " + error.message);

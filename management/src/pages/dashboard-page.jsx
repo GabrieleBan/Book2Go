@@ -6,7 +6,7 @@ export default function DashboardPage() {
     const navigate = useNavigate();
 
     const actions = [
-        { id: 1, name: "Inventario", path: "/inventory" },
+        { id: 1, name: "Inventario", path: "/inventory/manage/" },
         { id: 2, name: "Prestiti", path: "/staff-lending-actions" },
         { id: 3, name: "Acquisti", path: "/purchases" },
         { id: 4, name: "Catalogo", path: "/catalog" },

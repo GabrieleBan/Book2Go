@@ -133,7 +133,9 @@ export default function LendComponent({ formatId, formatType, onClose }) {
                         Durata prestito: {selectedOption.durationDays} giorni · Rinnovi max: {selectedOption.maxRenewals}
                     </p>
                 )}
-
+                {options.length === 0 && (
+                    <p className="text-red-500 mt-4">Il libro non ha opzioni di prestito disponibili.</p>
+                )}
                 {formatType !== "AUDIOBOOK" && formatType !== "EBOOK" && (
                     <>
                         <h3 className="text-lg font-medium mb-2">Seleziona libreria:</h3>
