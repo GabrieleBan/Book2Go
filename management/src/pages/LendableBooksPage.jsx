@@ -10,7 +10,41 @@ export default function LendableBooksPage() {
     const [durationDays, setDurationDays] = useState(30);
     const [maxRenewals, setMaxRenewals] = useState(0);
     const [minRequiredTier, setMinRequiredTier] = useState("UNSUBSCRIBED");
+    const [notLendable, setNotLendable] = useState(false);
+    const makeLendable = async () => {
+        setLoading(true);
+        setResponseMessage("");
 
+        const token = getTokens()?.accessToken;
+        if (!token) {
+            setResponseMessage("Errore: Token di autenticazione mancante.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API.LEND}/lendable-formats/${uuid}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                setResponseMessage(errorData.message || "Errore durante la creazione del libro prestabile.");
+                return;
+            }
+
+            setResponseMessage("Libro reso prestabile con successo.");
+            setNotLendable(false);
+            checkIfLendable();
+        } catch (error) {
+            setResponseMessage("Errore durante la richiesta: " + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
     const checkIfLendable = async () => {
         if (!uuid) {
             setResponseMessage("UUID non valido. Inserisci l'UUID del libro.");
@@ -19,7 +53,7 @@ export default function LendableBooksPage() {
 
         setLoading(true);
         setResponseMessage("");
-        setLendableOptions(null); // Resettiamo le opzioni precedenti
+        setLendableOptions(null);
 
         const token = getTokens()?.accessToken;
         if (!token) {
@@ -38,22 +72,32 @@ export default function LendableBooksPage() {
                 },
             });
 
+            if (response.status === 404 || response.status === 400) {
+
+                const errorData = await response.json();
+                setResponseMessage(errorData.message || "Il libro non è ancora prestabile.");
+                setNotLendable(true);
+                setLendableOptions(null);
+                return;
+            }
+
             if (!response.ok) {
                 const errorData = await response.json();
                 setResponseMessage(errorData.message || "Errore sconosciuto durante la richiesta.");
                 return;
             }
 
-            const options = await response.json();
 
-            // Se ci sono opzioni, mostra le opzioni
+            const options = await response.json();
+            setNotLendable(false);
+
             if (options.length > 0) {
                 setLendableOptions(options);
-                setResponseMessage(""); // Reset messaggio di errore
+                setResponseMessage("");
             } else {
-                // Se non ci sono opzioni, mostriamo comunque che il libro è prestabile e permettiamo l'aggiunta delle opzioni
+
                 setResponseMessage("Il libro è prestabile, ma non ha opzioni disponibili.");
-                setLendableOptions([]); // Settiamo un array vuoto per indicare che il libro è lendable ma senza opzioni
+                setLendableOptions([]);
             }
         } catch (error) {
             console.error("Errore durante la richiesta", error);
@@ -141,6 +185,17 @@ export default function LendableBooksPage() {
                 {responseMessage && (
                     <div className="mt-4 text-center text-gray-700">
                         <p>{responseMessage}</p>
+                    </div>
+                )}
+                {notLendable && (
+                    <div className="mt-4">
+                        <button
+                            onClick={makeLendable}
+                            className="w-full p-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+                            disabled={loading}
+                        >
+                            {loading ? "Creazione..." : "Rendi libro prestabile"}
+                        </button>
                     </div>
                 )}
 
