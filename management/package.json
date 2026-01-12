@@ -9,6 +9,7 @@
     "build:docker": "vite build --mode docker",
     "build:k8s": "vite build --mode kubernetes",
     "lint": "eslint .",
+    "prod": "vite --mode prod",
     "preview": "vite preview"
   },
   "dependencies": {

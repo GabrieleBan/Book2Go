@@ -38,6 +38,7 @@ export default function StaffLoggingPage() {
     const handleLogin = async () => {
         setError("");
         try {
+            console.log(API.AUTH,"/auth/login")
             const response = await fetch(`${API.AUTH}/auth/login`, {
                 method: "POST",
                 body: JSON.stringify({ username, password }),
